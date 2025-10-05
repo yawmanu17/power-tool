@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Water System Power Analysis Dashboard</title>
+  <title>PowerWise — Know Your Power Bill</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
@@ -69,15 +69,12 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex items-center">
             <i class="fas fa-tint text-blue-500 text-3xl mr-3"></i>
-            <h1 class="text-2xl font-bold text-gray-900">Water System Power Analysis Dashboard</h1>
+            <h1 class="text-2xl font-bold text-gray-900">PowerWise</h1>
           </div>
           <div class="mt-4 md:mt-0 flex gap-4 items-center">
             <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition">
               <i class="fas fa-file-invoice-dollar mr-1"></i> Know Your Power Bill
             </a>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-              <i class="fas fa-bolt mr-1"></i> Solomon Power Analysis
-            </span>
           </div>
         </div>
       </div>
@@ -242,9 +239,7 @@
               <button id="correction-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
                 <i class="fas fa-adjust mr-1"></i> PF Correction
               </button>
-              <button id="economics-tab" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                <i class="fas fa-dollar-sign mr-1"></i> Economics
-              </button>
+              <!-- Economics tab removed — summary contains full economics -->
             </nav>
           </div>
           
@@ -421,9 +416,7 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-4">
-                  <div class="w-56 h-40 chart-container">
-                    <canvas id="devices-power-triangle-chart"></canvas>
-                  </div>
+                  <!-- Power triangle for devices removed here; shown only in PF Correction section per user request -->
                   <button id="download-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                     <i class="fas fa-download mr-2"></i> Download CSV
                   </button>
@@ -490,85 +483,21 @@
                 
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div class="chart-container">
-                    <canvas id="before-correction-chart"></canvas>
+                      <canvas id="before-correction-chart"></canvas>
                   </div>
                   <div class="chart-container">
-                    <canvas id="after-correction-chart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Economics Tab Content -->
-            <div id="economics-content" class="hidden">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Current Costs</h3>
-                  <div class="space-y-4">
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Energy Consumption</p>
-                      <p id="energy-consumption" class="text-xl font-semibold text-gray-800">0 kWh/month</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Energy Cost</p>
-                      <p id="energy-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Reactive Energy</p>
-                      <p id="reactive-energy" class="text-xl font-semibold text-gray-800">0 kVArh/month</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Reactive Cost</p>
-                      <p id="reactive-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
-                    </div>
+                      <canvas id="after-correction-chart"></canvas>
                   </div>
                 </div>
                 
-                <div id="savings-container" class="hidden">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Potential Savings</h3>
-                  <div class="space-y-4">
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Corrected Reactive Cost</p>
-                      <p id="corrected-reactive-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
-                    </div>
-                    <div>
-                      <p class="text-sm font-medium text-gray-500">Energy Loss Savings</p>
-                      <p id="energy-savings" class="text-xl font-semibold text-gray-800">$0/month</p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                      <p class="text-sm font-medium text-gray-500">Total Potential Savings</p>
-                      <p id="total-savings" class="text-2xl font-bold text-blue-800">$0/month</p>
-                    </div>
+                  <!-- Power triangle for correction (only shown in PF Correction tab) -->
+                  <div class="mt-6 chart-container">
+                    <canvas id="correction-power-triangle"></canvas>
                   </div>
-                </div>
-              </div>
-              
-              <div id="no-savings" class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-                <div class="flex">
-                  <div class="flex-shrink-0">
-                    <i class="fas fa-info-circle text-blue-400"></i>
-                  </div>
-                  <div class="ml-3">
-                    <p class="text-sm text-blue-700">Apply power factor correction to see potential savings.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Cost Bar Chart -->
-              <div class="mt-8">
-                <h3 class="text-lg font-medium text-gray-900 mb-4">Cost Breakdown</h3>
-                <div class="chart-container">
-                  <canvas id="cost-bar-chart"></canvas>
-                </div>
-              </div>
-              
-              <!-- Download Report Button -->
-              <div class="mt-6 flex justify-end">
-                <button id="download-report" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <i class="fas fa-file-pdf mr-2"></i> Download Standard Report
-                </button>
               </div>
             </div>
+            
+            <!-- Economics tab removed — all economics are shown in Summary for easy access -->
           </div>
         </div>
       </div>
@@ -590,6 +519,100 @@
     const toNum = (v) => (typeof v === 'number' && !isNaN(v) ? v : 0);
 
   const CorrectionSafe = (val) => (val === null || val === undefined ? '$0/month' : val);
+
+    // Safe DOM helpers
+    const safeShow = (el) => { if (el && el.classList) el.classList.remove('hidden'); };
+    const safeHide = (el) => { if (el && el.classList) el.classList.add('hidden'); };
+
+    // Local storage helpers
+    const STORAGE_KEY = 'powerwise_state_v1';
+    const saveState = (state) => {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) { console.warn('Could not save state', e); }
+    };
+    const loadState = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) { console.warn('Could not load state', e); return null; }
+    };
+
+    const captureState = () => {
+      // serialize devices and main settings
+      const devices = Array.from(elements.devicesContainer.querySelectorAll('.device')).map(d => {
+        const equipment = d.querySelector('.equipment-type')?.value || '';
+        const loadType = d.querySelector('.load-type')?.value || '';
+        return {
+          equipment,
+          loadType,
+          P: parseFloat(d.querySelector('.p-value')?.value) || 0,
+          S: parseFloat(d.querySelector('.s-value')?.value) || 0,
+          Q: parseFloat(d.querySelector('.q-value')?.value) || 0,
+          I: parseFloat(d.querySelector('.i-value')?.value) || 0,
+          pf: parseFloat(d.querySelector('.pf-value')?.value) || null
+        };
+      });
+
+      const state = {
+        voltage: elements.voltage.value,
+        systemType: elements.systemType,
+        numDevices: elements.numDevices.value,
+        devices,
+        utilityRate: elements.utilityRate.value,
+        reactiveRate: elements.reactiveRate.value,
+        operatingHours: elements.operatingHours.value,
+        operatingDays: elements.operatingDays.value,
+        pfCorrection: elements.pfCorrectionSelect.value,
+        pfTarget: elements.pfTarget.value
+      };
+      // Add computed economics from summary/table if available
+      const tryTxt = id => { const el = document.getElementById(id); return el ? el.textContent.trim() : null; };
+      state.energyConsumption = tryTxt('summary-energy-consumption') || tryTxt('tbl-energy-consumption');
+      state.energyCost = tryTxt('summary-energy-cost') || tryTxt('tbl-energy-cost');
+      state.reactiveEnergy = tryTxt('summary-reactive-energy') || tryTxt('tbl-reactive-energy');
+      state.reactiveCost = tryTxt('summary-reactive-cost') || tryTxt('tbl-reactive-cost');
+      state.correctedReactiveCost = tryTxt('tbl-corrected-reactive-cost') || null;
+      state.energySavings = tryTxt('tbl-energy-savings') || null;
+      state.totalSavings = tryTxt('tbl-total-savings') || null;
+
+      saveState(state);
+    };
+
+    const restoreState = (state) => {
+      try {
+        if (!state) return;
+        elements.voltage.value = state.voltage ?? elements.voltage.value;
+        elements.systemType = state.systemType ?? elements.systemType;
+        elements.numDevices.value = state.numDevices ?? elements.numDevices.value;
+        elements.utilityRate.value = state.utilityRate ?? elements.utilityRate.value;
+        elements.reactiveRate.value = state.reactiveRate ?? elements.reactiveRate.value;
+        elements.operatingHours.value = state.operatingHours ?? elements.operatingHours.value;
+        elements.operatingDays.value = state.operatingDays ?? elements.operatingDays.value;
+        elements.pfCorrectionSelect.value = state.pfCorrection ?? elements.pfCorrectionSelect.value;
+        elements.pfTarget.value = state.pfTarget ?? elements.pfTarget.value;
+
+        // rebuild devices
+        elements.devicesContainer.innerHTML = '';
+        const devices = state.devices || [];
+        devices.forEach((d, i) => {
+          addDevice(i);
+          const dev = elements.devicesContainer.querySelector(`.device[data-index="${i}"]`);
+          if (!dev) return;
+          dev.querySelector('.equipment-type').value = d.equipment || dev.querySelector('.equipment-type').value;
+          dev.querySelector('.load-type').value = d.loadType || dev.querySelector('.load-type').value;
+          // force load params refresh
+          dev.querySelector('.load-parameters').innerHTML = loadTypeTemplates[dev.querySelector('.load-type').value];
+          setTimeout(()=>{
+            if (d.P !== undefined) { const p = dev.querySelector('.p-value'); if (p) p.value = d.P; }
+            if (d.S !== undefined) { const s = dev.querySelector('.s-value'); if (s) s.value = d.S; }
+            if (d.Q !== undefined) { const q = dev.querySelector('.q-value'); if (q) q.value = d.Q; }
+            if (d.I !== undefined) { const iel = dev.querySelector('.i-value'); if (iel) iel.value = d.I; }
+            if (d.pf !== undefined && d.pf !== null) { const pf = dev.querySelector('.pf-value'); if (pf) pf.value = d.pf; }
+          }, 0);
+        });
+      } catch (e) { console.warn('restoreState error', e); }
+    };
 
     // Core calculations
     const calculatePowerParameters = (V_kV, params, systemType) => {
@@ -771,38 +794,37 @@
   summaryReactiveCost: document.getElementById('summary-reactive-cost'),
       
       // Devices tab
-      devicesResultsBody: document.getElementById('devices-results-body'),
-      downloadCsv: document.getElementById('download-csv'),
-  devicesTotalP: document.getElementById('devices-total-p'),
-  devicesTotalQ: document.getElementById('devices-total-q'),
-  devicesPowerTriangleChart: document.getElementById('devices-power-triangle-chart'),
+        devicesResultsBody: document.getElementById('devices-results-body'),
+        downloadCsv: document.getElementById('download-csv'),
+      devicesTotalP: document.getElementById('devices-total-p'),
+      devicesTotalQ: document.getElementById('devices-total-q'),
       
       // Correction tab
       noCorrectionNeeded: document.getElementById('no-correction-needed'),
       correctionResults: document.getElementById('correction-results'),
       qcNeeded: document.getElementById('qc-needed'),
-      xcOhm: document.getElementById('xc-ohm'),
+  xcOhm: document.getElementById('xc-ohm'),
       cTotal: document.getElementById('c-total'),
       perPhaseContainer: document.getElementById('per-phase-container'),
       cPerPhase: document.getElementById('c-per-phase'),
       correctedPf: document.getElementById('corrected-pf'),
       correctedQ: document.getElementById('corrected-q'),
       correctedS: document.getElementById('corrected-s'),
-      beforeCorrectionChart: document.getElementById('before-correction-chart'),
-      afterCorrectionChart: document.getElementById('after-correction-chart'),
+  beforeCorrectionChart: document.getElementById('before-correction-chart'),
+  afterCorrectionChart: document.getElementById('after-correction-chart'),
+  correctionPowerTriangle: document.getElementById('correction-power-triangle'),
       
-      // Economics tab
-      energyConsumption: document.getElementById('energy-consumption'),
-      energyCost: document.getElementById('energy-cost'),
-      reactiveEnergy: document.getElementById('reactive-energy'),
-      reactiveCost: document.getElementById('reactive-cost'),
-      savingsContainer: document.getElementById('savings-container'),
-      correctedReactiveCost: document.getElementById('corrected-reactive-cost'),
-      energySavings: document.getElementById('energy-savings'),
-      totalSavings: document.getElementById('total-savings'),
-      noSavings: document.getElementById('no-savings'),
-      costBarChart: document.getElementById('cost-bar-chart'),
-      downloadReport: document.getElementById('download-report'),
+  // Optional economics elements (may be null)
+  energyConsumption: document.getElementById('energy-consumption'),
+  energyCost: document.getElementById('energy-cost'),
+  reactiveEnergy: document.getElementById('reactive-energy'),
+  reactiveCost: document.getElementById('reactive-cost'),
+  savingsContainer: document.getElementById('savings-container'),
+  correctedReactiveCost: document.getElementById('corrected-reactive-cost'),
+  energySavings: document.getElementById('energy-savings'),
+  totalSavings: document.getElementById('total-savings'),
+  noSavings: document.getElementById('no-savings'),
+  costBarChart: document.getElementById('cost-bar-chart'),
       
       // Tabs
       summaryTab: document.getElementById('summary-tab'),
@@ -978,11 +1000,13 @@
       // When equipment type changes, apply defaults
       equipmentSelect.addEventListener('change', (e) => {
         applyEquipmentDefaults(e.target.value);
+        captureState();
       });
       
       // Add event listener for load type change
       loadTypeSelect.addEventListener('change', (e) => {
         loadParamsDiv.innerHTML = loadTypeTemplates[e.target.value];
+        captureState();
       });
       
       // Add event listener for remove device
@@ -991,6 +1015,7 @@
         if (elements.devicesContainer.querySelectorAll('.device').length > 1) {
           deviceDiv.remove();
           elements.numDevices.value = parseInt(elements.numDevices.value) - 1;
+          captureState();
         } else {
           showError('You must have at least one device.');
         }
@@ -1281,7 +1306,9 @@
         );
         
         // Update UI with results
-        updateResultsUI(totalP_kW, totalQ_kVAr, totalS_kVA, totalPf, deviceResults, cost, correction);
+  updateResultsUI(totalP_kW, totalQ_kVAr, totalS_kVA, totalPf, deviceResults, cost, correction);
+  // persist current state
+  captureState();
         
       } catch (err) {
         showError(err.message || 'An error occurred during calculation.');
@@ -1339,18 +1366,7 @@
       if (elements.devicesTotalP) elements.devicesTotalP.textContent = `${totalP_kW.toFixed(2)} kW`;
       if (elements.devicesTotalQ) elements.devicesTotalQ.textContent = `${totalQ_kVAr.toFixed(2)} kVAr`;
 
-      // Devices power triangle chart
-      if (window.devicesPowerChart) window.devicesPowerChart.destroy();
-      if (elements.devicesPowerTriangleChart) {
-        window.devicesPowerChart = createPowerTriangleChart(
-          elements.devicesPowerTriangleChart,
-          totalP_kW,
-          totalQ_kVAr,
-          totalS_kVA,
-          pfToDeg(totalPf),
-          'Devices Power Triangle'
-        );
-      }
+      // Devices power triangle was removed from Devices tab (showing only in PF Correction per request)
       
       // Update economics
       if (elements.energyConsumption) elements.energyConsumption.textContent = `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`;
@@ -1377,12 +1393,12 @@
           elements.perPhaseContainer.classList.add('hidden');
         }
         
-        // Update savings
-        elements.savingsContainer.classList.remove('hidden');
-        elements.noSavings.classList.add('hidden');
-        elements.correctedReactiveCost.textContent = `$${correction.reactiveCost_after.toFixed(2)}/month`;
-        elements.energySavings.textContent = `$${correction.energyLossSavings.toFixed(2)}/month`;
-        elements.totalSavings.textContent = `$${correction.totalSavings.toFixed(2)}/month`;
+  // Update savings (guard optional elements)
+  if (elements.savingsContainer) elements.savingsContainer.classList.remove('hidden');
+  if (elements.noSavings) elements.noSavings.classList.add('hidden');
+  if (elements.correctedReactiveCost) elements.correctedReactiveCost.textContent = `$${correction.reactiveCost_after.toFixed(2)}/month`;
+  if (elements.energySavings) elements.energySavings.textContent = `$${correction.energyLossSavings.toFixed(2)}/month`;
+  if (elements.totalSavings) elements.totalSavings.textContent = `$${correction.totalSavings.toFixed(2)}/month`;
         
         // Create before/after correction charts
         if (window.beforeCorrectionChart) window.beforeCorrectionChart.destroy();
@@ -1396,7 +1412,7 @@
           pfToDeg(totalPf),
           'Before Correction'
         );
-        
+
         window.afterCorrectionChart = createPowerTriangleChart(
           elements.afterCorrectionChart,
           totalP_kW,
@@ -1405,6 +1421,19 @@
           pfToDeg(correction.correctedPf),
           'After Correction'
         );
+
+        // Draw single combined power triangle in the correction area
+        if (window.correctionPowerTriangle) try { window.correctionPowerTriangle.destroy(); } catch (e) {}
+        if (elements.correctionPowerTriangle) {
+          window.correctionPowerTriangle = createPowerTriangleChart(
+            elements.correctionPowerTriangle,
+            totalP_kW,
+            correction.correctedQ_kVAr,
+            correction.correctedS_kVA,
+            pfToDeg(correction.correctedPf),
+            'Power Triangle (Corrected)'
+          );
+        }
       } else {
         elements.correctionResults.classList.add('hidden');
         
@@ -1414,8 +1443,8 @@
           elements.noCorrectionNeeded.classList.add('hidden');
         }
         
-        elements.savingsContainer.classList.add('hidden');
-        elements.noSavings.classList.remove('hidden');
+  if (elements.savingsContainer) elements.savingsContainer.classList.add('hidden');
+  if (elements.noSavings) elements.noSavings.classList.remove('hidden');
       }
       
       // Remove power triangle from summary (we display it on Devices tab)
@@ -1424,16 +1453,18 @@
         window.powerTriangleChart = null;
       }
       
-      // Create cost bar chart for Economics tab
-      if (window.costBarChart) window.costBarChart.destroy();
-      window.costBarChart = createCostBarChart(
-        elements.costBarChart,
-        cost.energyCost_USD,
-        cost.reactiveCost_USD,
-        correction ? correction.reactiveCost_after : 0,
-        correction ? correction.energyLossSavings : 0,
-        correction ? correction.totalSavings : 0
-      );
+      // Create optional cost bar chart (some layouts may not include the extra canvas)
+      if (elements.costBarChart) {
+        if (window.costBarChart) window.costBarChart.destroy();
+        window.costBarChart = createCostBarChart(
+          elements.costBarChart,
+          cost.energyCost_USD,
+          cost.reactiveCost_USD,
+          correction ? correction.reactiveCost_after : 0,
+          correction ? correction.energyLossSavings : 0,
+          correction ? correction.totalSavings : 0
+        );
+      }
 
       // Update economics comparison table
       const setTbl = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
@@ -1498,6 +1529,7 @@
       const currentCount = elements.devicesContainer.querySelectorAll('.device').length;
       addDevice(currentCount);
       elements.numDevices.value = currentCount + 1;
+      captureState();
     });
 
     elements.numDevices.addEventListener('change', () => {
@@ -1522,6 +1554,7 @@
             devices[i].remove();
           }
         }
+        captureState();
       }
     });
 
@@ -1537,11 +1570,11 @@
       const value = parseFloat(e.target.value);
       elements.pfTargetValue.textContent = value.toFixed(2);
       updatePfMarker(elements.pfTargetMarker, value);
+      captureState();
     });
 
     elements.calculateBtn.addEventListener('click', calculateResults);
-    elements.downloadCsv.addEventListener('click', downloadCSV);
-    elements.downloadReport.addEventListener('click', downloadReport);
+  if (elements.downloadCsv) elements.downloadCsv.addEventListener('click', downloadCSV);
 
     // System type buttons
     if (elements.singlePhaseBtn) elements.singlePhaseBtn.addEventListener('click', () => {
@@ -1566,61 +1599,73 @@
 
     // Tab switching
     if (elements.summaryTab) elements.summaryTab.addEventListener('click', () => {
-      elements.summaryContent.classList.remove('hidden');
-      elements.devicesContent.classList.add('hidden');
-      elements.correctionContent.classList.add('hidden');
-      elements.economicsContent.classList.add('hidden');
+      safeShow(elements.summaryContent);
+      safeHide(elements.devicesContent);
+      safeHide(elements.correctionContent);
+      safeHide(elements.economicsContent);
       
       elements.summaryTab.classList.add('tab-active');
-      elements.devicesTab.classList.remove('tab-active');
-      elements.correctionTab.classList.remove('tab-active');
-      elements.economicsTab.classList.remove('tab-active');
+      if (elements.devicesTab) elements.devicesTab.classList.remove('tab-active');
+      if (elements.correctionTab) elements.correctionTab.classList.remove('tab-active');
+      if (elements.economicsTab) elements.economicsTab.classList.remove('tab-active');
     });
 
     if (elements.devicesTab) elements.devicesTab.addEventListener('click', () => {
-      elements.summaryContent.classList.add('hidden');
-      elements.devicesContent.classList.remove('hidden');
-      elements.correctionContent.classList.add('hidden');
-      elements.economicsContent.classList.add('hidden');
+      safeHide(elements.summaryContent);
+      safeShow(elements.devicesContent);
+      safeHide(elements.correctionContent);
+      safeHide(elements.economicsContent);
       
-      elements.summaryTab.classList.remove('tab-active');
+      if (elements.summaryTab) elements.summaryTab.classList.remove('tab-active');
       elements.devicesTab.classList.add('tab-active');
-      elements.correctionTab.classList.remove('tab-active');
-      elements.economicsTab.classList.remove('tab-active');
+      if (elements.correctionTab) elements.correctionTab.classList.remove('tab-active');
+      if (elements.economicsTab) elements.economicsTab.classList.remove('tab-active');
     });
 
     if (elements.correctionTab) elements.correctionTab.addEventListener('click', () => {
-      elements.summaryContent.classList.add('hidden');
-      elements.devicesContent.classList.add('hidden');
-      elements.correctionContent.classList.remove('hidden');
-      elements.economicsContent.classList.add('hidden');
+      safeHide(elements.summaryContent);
+      safeHide(elements.devicesContent);
+      safeShow(elements.correctionContent);
+      safeHide(elements.economicsContent);
       
-      elements.summaryTab.classList.remove('tab-active');
-      elements.devicesTab.classList.remove('tab-active');
+      if (elements.summaryTab) elements.summaryTab.classList.remove('tab-active');
+      if (elements.devicesTab) elements.devicesTab.classList.remove('tab-active');
       elements.correctionTab.classList.add('tab-active');
-      elements.economicsTab.classList.remove('tab-active');
+      if (elements.economicsTab) elements.economicsTab.classList.remove('tab-active');
     });
 
     if (elements.economicsTab) elements.economicsTab.addEventListener('click', () => {
-      elements.summaryContent.classList.add('hidden');
-      elements.devicesContent.classList.add('hidden');
-      elements.correctionContent.classList.add('hidden');
-      elements.economicsContent.classList.remove('hidden');
+      safeHide(elements.summaryContent);
+      safeHide(elements.devicesContent);
+      safeHide(elements.correctionContent);
+      safeShow(elements.economicsContent);
       
-      elements.summaryTab.classList.remove('tab-active');
-      elements.devicesTab.classList.remove('tab-active');
-      elements.correctionTab.classList.remove('tab-active');
+      if (elements.summaryTab) elements.summaryTab.classList.remove('tab-active');
+      if (elements.devicesTab) elements.devicesTab.classList.remove('tab-active');
+      if (elements.correctionTab) elements.correctionTab.classList.remove('tab-active');
       elements.economicsTab.classList.add('tab-active');
     });
 
   // Initialize
   initializeDevices();
+  // Restore saved state if any
+  const saved = loadState();
+  if (saved) {
+    restoreState(saved);
+  }
   // Ensure system type UI reflects default
   if (elements.singlePhaseBtn) elements.singlePhaseBtn.click();
   elements.pfTarget.dispatchEvent(new Event('input'));
   // Show summary tab by default
   if (elements.summaryTab) elements.summaryTab.click();
+  // Recalculate to populate UI from restored state
+  calculateResults();
     
   </script>
+  <!-- Footer -->
+  <footer class="mt-8 text-center text-xs text-gray-500 pb-8">
+    <div>Built by Ofori Mas. <span class="font-semibold">PowerWise</span>™ — Conserving power and saving money.</div>
+    <div class="mt-1">All rights reserved. Patent pending.</div>
+  </footer>
 </body>
 </html>
