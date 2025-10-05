@@ -326,8 +326,67 @@
                 </div>
               </div>
               
-              <div class="chart-container">
-                <canvas id="power-triangle-chart"></canvas>
+              <!-- Summary Economics (compact view) -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <div class="result-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <p class="text-sm font-medium text-gray-500">Energy Consumption</p>
+                  <p id="summary-energy-consumption" class="text-xl font-semibold text-gray-800">0 kWh/month</p>
+                  <p class="text-xs text-gray-500 mt-2">Total electrical energy used per month by all devices (useful for billing).</p>
+                  <p class="text-sm font-medium text-gray-500 mt-3">Energy Cost</p>
+                  <p id="summary-energy-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
+                  <p class="text-xs text-gray-500 mt-2">Estimated monthly cost for consumed energy at your utility rate.</p>
+                </div>
+                <div class="result-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                  <p class="text-sm font-medium text-gray-500">Reactive Energy</p>
+                  <p id="summary-reactive-energy" class="text-xl font-semibold text-gray-800">0 kVArh/month</p>
+                  <p class="text-xs text-gray-500 mt-2">Reactive energy drawn by inductive loads — often charged separately by utilities.</p>
+                  <p class="text-sm font-medium text-gray-500 mt-3">Reactive Cost</p>
+                  <p id="summary-reactive-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
+                  <p class="text-xs text-gray-500 mt-2">Estimated monthly reactive energy charge at your reactive rate.</p>
+                </div>
+              </div>
+
+              <!-- Economics comparison table and cost chart -->
+              <div class="mt-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <h3 class="text-lg font-medium text-gray-800 mb-3">Economics Summary</h3>
+                <div class="overflow-x-auto">
+                  <table class="min-w-full text-sm text-left text-gray-700">
+                    <tbody>
+                      <tr class="border-b">
+                        <td class="px-4 py-2 font-medium">Energy Consumption</td>
+                        <td id="tbl-energy-consumption" class="px-4 py-2">0 kWh/month</td>
+                      </tr>
+                      <tr class="border-b bg-gray-50">
+                        <td class="px-4 py-2 font-medium">Energy Cost</td>
+                        <td id="tbl-energy-cost" class="px-4 py-2">$0/month</td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="px-4 py-2 font-medium">Reactive Energy</td>
+                        <td id="tbl-reactive-energy" class="px-4 py-2">0 kVArh/month</td>
+                      </tr>
+                      <tr class="border-b bg-gray-50">
+                        <td class="px-4 py-2 font-medium">Reactive Cost</td>
+                        <td id="tbl-reactive-cost" class="px-4 py-2">$0/month</td>
+                      </tr>
+                      <tr class="border-b">
+                        <td class="px-4 py-2 font-medium">Corrected Reactive Cost (if applied)</td>
+                        <td id="tbl-corrected-reactive-cost" class="px-4 py-2">$0/month</td>
+                      </tr>
+                      <tr class="border-b bg-gray-50">
+                        <td class="px-4 py-2 font-medium">Energy Loss Savings (estimate)</td>
+                        <td id="tbl-energy-savings" class="px-4 py-2">$0/month</td>
+                      </tr>
+                      <tr>
+                        <td class="px-4 py-2 font-medium">Total Potential Savings</td>
+                        <td id="tbl-total-savings" class="px-4 py-2 font-semibold text-blue-800">$0/month</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="mt-4 chart-container h-48">
+                  <canvas id="summary-cost-bar-chart"></canvas>
+                </div>
               </div>
             </div>
             
@@ -350,10 +409,26 @@
                   </tbody>
                 </table>
               </div>
-              <div class="mt-4 flex justify-end">
-                <button id="download-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <i class="fas fa-download mr-2"></i> Download CSV
-                </button>
+              <div class="mt-4 flex justify-between items-center">
+                <div class="flex items-center gap-6">
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Devices Total Real Power</p>
+                    <p id="devices-total-p" class="text-lg font-semibold text-gray-800">0 kW</p>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-500">Devices Total Reactive Power</p>
+                    <p id="devices-total-q" class="text-lg font-semibold text-gray-800">0 kVAr</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-4">
+                  <div class="w-56 h-40 chart-container">
+                    <canvas id="devices-power-triangle-chart"></canvas>
+                  </div>
+                  <button id="download-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <i class="fas fa-download mr-2"></i> Download CSV
+                  </button>
+                </div>
+              </div>
               </div>
             </div>
             
@@ -513,6 +588,8 @@
     };
 
     const toNum = (v) => (typeof v === 'number' && !isNaN(v) ? v : 0);
+
+  const CorrectionSafe = (val) => (val === null || val === undefined ? '$0/month' : val);
 
     // Core calculations
     const calculatePowerParameters = (V_kV, params, systemType) => {
@@ -687,10 +764,18 @@
       totalZ: document.getElementById('total-z'),
       currentPfMarker: document.getElementById('current-pf-marker'),
       powerTriangleChart: document.getElementById('power-triangle-chart'),
+  // Summary economics quick view
+  summaryEnergyConsumption: document.getElementById('summary-energy-consumption'),
+  summaryEnergyCost: document.getElementById('summary-energy-cost'),
+  summaryReactiveEnergy: document.getElementById('summary-reactive-energy'),
+  summaryReactiveCost: document.getElementById('summary-reactive-cost'),
       
       // Devices tab
       devicesResultsBody: document.getElementById('devices-results-body'),
       downloadCsv: document.getElementById('download-csv'),
+  devicesTotalP: document.getElementById('devices-total-p'),
+  devicesTotalQ: document.getElementById('devices-total-q'),
+  devicesPowerTriangleChart: document.getElementById('devices-power-triangle-chart'),
       
       // Correction tab
       noCorrectionNeeded: document.getElementById('no-correction-needed'),
@@ -745,9 +830,14 @@
           <select class="equipment-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
             <option value="Motor">Motor</option>
             <option value="Pump">Pump</option>
-            <option value="Generator">Generator</option>
-            <option value="Actuator">Actuator</option>
+            <option value="HVAC">HVAC (AC / Heat Pump)</option>
+            <option value="Compressor">Compressor</option>
+            <option value="Boiler">Boiler</option>
+            <option value="Elevator">Elevator</option>
+            <option value="Lighting">Lighting (Circuits)</option>
+            <option value="Welding">Welding / Heavy Tools</option>
             <option value="Transformer">Transformer</option>
+            <option value="Actuator">Actuator</option>
           </select>
         </div>
         
@@ -811,6 +901,20 @@
       `
     };
 
+    // Common equipment defaults (nameplate-like typical values) for user convenience
+    const equipmentDefaults = {
+      'Motor': { loadType: 'P & pf', P: 5, pf: 0.85 },
+      'Pump': { loadType: 'P & pf', P: 3, pf: 0.8 },
+      'HVAC': { loadType: 'P & pf', P: 7, pf: 0.9 },
+      'Compressor': { loadType: 'P & pf', P: 10, pf: 0.85 },
+      'Boiler': { loadType: 'P & pf', P: 15, pf: 0.95 },
+      'Elevator': { loadType: 'P & pf', P: 8, pf: 0.85 },
+      'Lighting': { loadType: 'S & pf', S: 1, pf: 0.98 },
+      'Welding': { loadType: 'P & pf', P: 12, pf: 0.7 },
+      'Transformer': { loadType: 'S & pf', S: 20, pf: 0.95 },
+      'Actuator': { loadType: 'P & pf', P: 0.5, pf: 0.9 }
+    };
+
     // Initialize the first device
     const initializeDevices = () => {
       elements.devicesContainer.innerHTML = '';
@@ -833,6 +937,48 @@
       const loadParamsDiv = deviceDiv.querySelector('.load-parameters');
       
       loadParamsDiv.innerHTML = loadTypeTemplates['P & pf'];
+
+      // Auto-fill parameters based on equipment defaults
+      const equipmentSelect = deviceDiv.querySelector('.equipment-type');
+      const applyEquipmentDefaults = (equip) => {
+        const def = equipmentDefaults[equip];
+        if (!def) return;
+        // set load type
+        loadTypeSelect.value = def.loadType;
+        loadParamsDiv.innerHTML = loadTypeTemplates[def.loadType];
+
+        // after injecting inputs, fill values
+        setTimeout(() => {
+          if (def.P !== undefined) {
+            const pInput = deviceDiv.querySelector('.p-value');
+            if (pInput) pInput.value = def.P;
+          }
+          if (def.S !== undefined) {
+            const sInput = deviceDiv.querySelector('.s-value');
+            if (sInput) sInput.value = def.S;
+          }
+          if (def.pf !== undefined) {
+            const pfInput = deviceDiv.querySelector('.pf-value');
+            if (pfInput) pfInput.value = def.pf;
+          }
+          if (def.Q !== undefined) {
+            const qInput = deviceDiv.querySelector('.q-value');
+            if (qInput) qInput.value = def.Q;
+          }
+          if (def.I !== undefined) {
+            const iInput = deviceDiv.querySelector('.i-value');
+            if (iInput) iInput.value = def.I;
+          }
+        }, 0);
+      };
+
+      // initialize equipment defaults for the current equipment selection
+      applyEquipmentDefaults(loadTypeSelect.previousElementSibling ? deviceDiv.querySelector('.equipment-type').value : 'Motor');
+
+      // When equipment type changes, apply defaults
+      equipmentSelect.addEventListener('change', (e) => {
+        applyEquipmentDefaults(e.target.value);
+      });
       
       // Add event listener for load type change
       loadTypeSelect.addEventListener('change', (e) => {
@@ -1182,6 +1328,29 @@
         `;
         elements.devicesResultsBody.appendChild(row);
       });
+
+      // Populate summary quick economics
+      if (elements.summaryEnergyConsumption) elements.summaryEnergyConsumption.textContent = `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`;
+      if (elements.summaryEnergyCost) elements.summaryEnergyCost.textContent = `$${cost.energyCost_USD.toFixed(2)}/month`;
+      if (elements.summaryReactiveEnergy) elements.summaryReactiveEnergy.textContent = `${cost.reactiveEnergy_kVArh.toFixed(2)} kVArh/month`;
+      if (elements.summaryReactiveCost) elements.summaryReactiveCost.textContent = `$${cost.reactiveCost_USD.toFixed(2)}/month`;
+
+      // Devices tab totals
+      if (elements.devicesTotalP) elements.devicesTotalP.textContent = `${totalP_kW.toFixed(2)} kW`;
+      if (elements.devicesTotalQ) elements.devicesTotalQ.textContent = `${totalQ_kVAr.toFixed(2)} kVAr`;
+
+      // Devices power triangle chart
+      if (window.devicesPowerChart) window.devicesPowerChart.destroy();
+      if (elements.devicesPowerTriangleChart) {
+        window.devicesPowerChart = createPowerTriangleChart(
+          elements.devicesPowerTriangleChart,
+          totalP_kW,
+          totalQ_kVAr,
+          totalS_kVA,
+          pfToDeg(totalPf),
+          'Devices Power Triangle'
+        );
+      }
       
       // Update economics
       if (elements.energyConsumption) elements.energyConsumption.textContent = `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`;
@@ -1249,16 +1418,11 @@
         elements.noSavings.classList.remove('hidden');
       }
       
-      // Create main power triangle chart
-      if (window.powerTriangleChart) window.powerTriangleChart.destroy();
-      window.powerTriangleChart = createPowerTriangleChart(
-        elements.powerTriangleChart,
-        totalP_kW,
-        totalQ_kVAr,
-        totalS_kVA,
-        pfToDeg(totalPf),
-        'Power Triangle Diagram'
-      );
+      // Remove power triangle from summary (we display it on Devices tab)
+      if (window.powerTriangleChart) {
+        try { window.powerTriangleChart.destroy(); } catch (e) {}
+        window.powerTriangleChart = null;
+      }
       
       // Create cost bar chart for Economics tab
       if (window.costBarChart) window.costBarChart.destroy();
@@ -1271,7 +1435,17 @@
         correction ? correction.totalSavings : 0
       );
 
-      // (Optional) if a summary cost chart exists in the DOM create/update it
+      // Update economics comparison table
+      const setTbl = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+      setTbl('tbl-energy-consumption', `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`);
+      setTbl('tbl-energy-cost', `$${cost.energyCost_USD.toFixed(2)}/month`);
+      setTbl('tbl-reactive-energy', `${cost.reactiveEnergy_kVArh.toFixed(2)} kVArh/month`);
+      setTbl('tbl-reactive-cost', `$${cost.reactiveCost_USD.toFixed(2)}/month`);
+      setTbl('tbl-corrected-reactive-cost',CorrectionSafe(correction ? `$${correction.reactiveCost_after.toFixed(2)}/month` : '$0/month'));
+      setTbl('tbl-energy-savings', CorrectionSafe(correction ? `$${correction.energyLossSavings.toFixed(2)}/month` : '$0/month'));
+      setTbl('tbl-total-savings', CorrectionSafe(correction ? `$${correction.totalSavings.toFixed(2)}/month` : '$0/month'));
+
+      // Create summary cost bar chart (summary-cost-bar-chart canvas)
       const summaryCostBar = document.getElementById('summary-cost-bar-chart');
       if (summaryCostBar) {
         if (window.summaryCostBarChart) window.summaryCostBarChart.destroy();
