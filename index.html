@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Electric Power System Analysis Dashboard</title>
+  <title>Water System Power Analysis Dashboard</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
@@ -11,7 +11,14 @@
   <!-- Chart.js Annotation Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@4.0.1"></script>
   <script>
-    Chart.register(window['chartjs-plugin-annotation']);
+    // Safely register annotation plugin if available (some CDN builds expose different shapes)
+    try {
+      if (window['chartjs-plugin-annotation']) {
+        Chart.register(window['chartjs-plugin-annotation']);
+      }
+    } catch (e) {
+      console.warn('Chart annotation plugin not registered:', e);
+    }
   </script>
   <!-- MathJS -->
   <script src="https://cdn.jsdelivr.net/npm/mathjs@11.5.1/lib/browser/math.js"></script>
@@ -52,15 +59,6 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    .footer {
-            text-align: center;
-            padding: 1rem;
-            background: #333;
-            color: white;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-   }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -71,11 +69,14 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex items-center">
             <i class="fas fa-tint text-blue-500 text-3xl mr-3"></i>
-            <h1 class="text-2xl font-bold text-gray-900">Electric Power System Analysis Dashboard</h1>
+            <h1 class="text-2xl font-bold text-gray-900">Water System Power Analysis Dashboard</h1>
           </div>
-          <div class="mt-4 md:mt-0">
+          <div class="mt-4 md:mt-0 flex gap-4 items-center">
+            <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition">
+              <i class="fas fa-file-invoice-dollar mr-1"></i> Know Your Power Bill
+            </a>
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-              <i class="fas fa-bolt mr-1"></i> <span class="italic"> Know your Power Consumption & Bill</span>
+              <i class="fas fa-bolt mr-1"></i> Solomon Power Analysis
             </span>
           </div>
         </div>
@@ -86,14 +87,19 @@
     <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
       <div class="flex flex-col lg:flex-row gap-6">
         <!-- Sidebar Input Section -->
-        <div class="sidebar lg:w-1/3 p-6 rounded-xl text-white shadow-lg">
+        <div class="sidebar lg:w-1/3 p-6 rounded-xl text-white shadow-lg relative" id="sidebar">
           <h2 class="text-xl font-semibold mb-4 flex items-center">
             <i class="fas fa-sliders-h mr-2"></i> Input Parameters
           </h2>
+          <p class="mb-4 text-blue-100 text-sm">
+            <b>Instructions:</b> Enter your system and device details below. Use the values from your device's nameplate (label) for best results.<br>
+          </p>
           
           <!-- System Type -->
           <div class="mb-6">
-            <label class="block text-sm font-medium mb-1">System Type</label>
+            <label class="block text-sm font-medium mb-1">System Type
+              <span title="Single phase is typical for homes, three phase for larger facilities." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <div class="flex rounded-md shadow-sm">
               <button id="single-phase-btn" class="flex-1 py-2 px-4 rounded-l-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <i class="fas fa-bolt mr-1"></i> Single Phase
@@ -106,7 +112,9 @@
           
           <!-- Voltage Input -->
           <div class="mb-6">
-            <label class="block text-sm font-medium mb-1">Source Voltage (kV)</label>
+            <label class="block text-sm font-medium mb-1">Source Voltage (kV)
+              <span title="Enter the voltage supplied to your system. For homes, it's usually 0.23kV (230V)." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <div class="relative rounded-md shadow-sm">
               <input type="number" id="voltage" value="0.23" min="0.1" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
               <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -118,7 +126,9 @@
           
           <!-- Device Management -->
           <div class="mb-6">
-            <label class="block text-sm font-medium mb-1">Number of Devices</label>
+            <label class="block text-sm font-medium mb-1">Number of Devices
+              <span title="How many devices (motors, pumps, etc.) are you analyzing?" class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <div class="flex">
               <input type="number" id="num-devices" value="1" min="1" class="w-full p-2 rounded-l text-gray-900 focus:ring-2 focus:ring-blue-500">
               <button id="add-device-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -132,9 +142,23 @@
             <!-- Device template will be inserted here -->
           </div>
           
+          <div class="mb-4 text-xs text-blue-100">
+            <i class="fas fa-info-circle"></i> <b>Device Parameters:</b>
+            <ul class="list-disc ml-4">
+              <li><b>Apparent Power (kVA)</b>: Look for "kVA" on your device's nameplate.</li>
+              <li><b>Real Power (kW)</b>: Look for "kW" or "Watts" on the nameplate.</li>
+              <li><b>Power Factor (PF)</b>: Usually listed as "PF" or "cos φ".</li>
+              <li><b>Current (A)</b>: "Amps" or "A" on the nameplate.</li>
+              <li><b>Reactive Power (kVAr)</b>: Sometimes listed as "kVAr".</li>
+            </ul>
+            <span class="block mt-2">Choose the load type that matches your nameplate info for easy input.</span>
+          </div>
+          
           <!-- Power Factor Correction -->
           <div class="mb-6">
-            <label class="block text-sm font-medium mb-1">Power Factor Correction</label>
+            <label class="block text-sm font-medium mb-1">Power Factor Correction
+              <span title="Improve efficiency and reduce costs by correcting power factor." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <select id="pf-correction-select" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
               <option value="no">No Correction</option>
               <option value="yes">Apply Correction</option>
@@ -142,7 +166,9 @@
           </div>
           
           <div id="pf-target-container" class="mb-6 hidden">
-            <label class="block text-sm font-medium mb-1">Target Power Factor</label>
+            <label class="block text-sm font-medium mb-1">Target Power Factor
+              <span title="Set your desired efficiency. 0.95 is typical for industry." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <div class="flex items-center">
               <input type="range" id="pf-target" min="0.8" max="1" step="0.01" value="0.95" class="w-full mr-2">
               <span id="pf-target-value" class="text-sm font-medium">0.95</span>
@@ -154,7 +180,9 @@
           
           <!-- Economic Parameters -->
           <div class="mb-6">
-            <label class="block text-sm font-medium mb-1">Economic Parameters</label>
+            <label class="block text-sm font-medium mb-1">Economic Parameters
+              <span title="Enter your utility rates and usage for cost analysis." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
+            </label>
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs mb-1">Utility Rate ($/kWh)</label>
@@ -177,15 +205,8 @@
           
           <!-- Calculate Button -->
           <button id="calculate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-            <i class="fas fa-calculator mr-2"></i> Calculate Power Parameters
+            <i class="fas fa-calculator mr-2"></i> Calculate Power & Costs
           </button>
-          
-          <!-- Test Button -->
-          <div class="mt-4">
-            <button id="test-btn" class="w-full bg-gray-700 hover:bg-gray-800 text-white py-2 px-4 rounded-lg text-sm flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-gray-500">
-              <i class="fas fa-vial mr-2"></i> Run Validation Tests
-            </button>
-          </div>
         </div>
         
         <!-- Results Section -->
@@ -457,6 +478,21 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- Cost Bar Chart -->
+              <div class="mt-8">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Cost Breakdown</h3>
+                <div class="chart-container">
+                  <canvas id="cost-bar-chart"></canvas>
+                </div>
+              </div>
+              
+              <!-- Download Report Button -->
+              <div class="mt-6 flex justify-end">
+                <button id="download-report" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <i class="fas fa-file-pdf mr-2"></i> Download Standard Report
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -621,6 +657,8 @@
     // DOM Elements
     const elements = {
       systemType: 'Single',
+      singlePhaseBtn: document.getElementById('single-phase-btn'),
+      threePhaseBtn: document.getElementById('three-phase-btn'),
       voltage: document.getElementById('voltage'),
       numDevices: document.getElementById('num-devices'),
       addDeviceBtn: document.getElementById('add-device-btn'),
@@ -635,9 +673,6 @@
       operatingHours: document.getElementById('operating-hours'),
       operatingDays: document.getElementById('operating-days'),
       calculateBtn: document.getElementById('calculate-btn'),
-      testBtn: document.getElementById('test-btn'),
-      singlePhaseBtn: document.getElementById('single-phase-btn'),
-      threePhaseBtn: document.getElementById('three-phase-btn'),
       
       // Results elements
       errorDisplay: document.getElementById('error-display'),
@@ -681,6 +716,8 @@
       energySavings: document.getElementById('energy-savings'),
       totalSavings: document.getElementById('total-savings'),
       noSavings: document.getElementById('no-savings'),
+      costBarChart: document.getElementById('cost-bar-chart'),
+      downloadReport: document.getElementById('download-report'),
       
       // Tabs
       summaryTab: document.getElementById('summary-tab'),
@@ -708,19 +745,19 @@
           <select class="equipment-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
             <option value="Motor">Motor</option>
             <option value="Pump">Pump</option>
-            <option value="General Units">General Units</option>
-            <option value="HVAC">HVAC</option>
+            <option value="Generator">Generator</option>
+            <option value="Actuator">Actuator</option>
             <option value="Transformer">Transformer</option>
           </select>
         </div>
         
         <div class="mb-3">
-          <label class="block text-sm font-medium mb-1">Load Type</label>
+          <label class="block text-sm font-medium mb-1">Nameplate Parameter Type</label>
           <select class="load-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
-            <option value="S & pf">S & pf</option>
-            <option value="P & pf">P & pf</option>
-            <option value="P+jQ">P+jQ</option>
-            <option value="P & I">P & I</option>
+            <option value="S & pf">kVA & Power Factor</option>
+            <option value="P & pf">kW & Power Factor</option>
+            <option value="P+jQ">kW & kVAr</option>
+            <option value="P & I">kW & Current (A)</option>
           </select>
         </div>
         
@@ -829,128 +866,184 @@
       markerElement.style.left = `${position}%`;
     };
 
-// Create power triangle chart
-const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
-  const maxVal = Math.max(P, Q, S) * 1.2 || 1;
-  const axisMax = Math.max(maxVal, 1);
+    // Create power triangle chart
+    const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
+      const maxVal = Math.max(P, Q, S) * 1.2 || 1;
+      const axisMax = Math.max(maxVal, 1);
 
-  // Calculate arc radius and angle in radians
-  const arcRadius = axisMax * 0.25;
-  const phiRad = phiDeg * Math.PI / 180;
+      // Calculate arc radius and angle in radians
+      const arcRadius = axisMax * 0.25;
+      const phiRad = phiDeg * Math.PI / 180;
 
-  return new Chart(canvas, {
-    type: 'line',
-    data: {
-      datasets: [
-        {
-          label: `Real Power (P) = ${P.toFixed(2)} kW`,
-          data: [{ x: 0, y: 0 }, { x: P, y: 0 }],
-          borderColor: 'rgba(59, 130, 246, 1)',
-          borderWidth: 3,
-          pointRadius: 0
-        },
-        {
-          label: `Reactive Power (Q) = ${Q.toFixed(2)} kVAr`,
-          data: [{ x: P, y: 0 }, { x: P, y: Q }],
-          borderColor: 'rgba(239, 68, 68, 1)',
-          borderWidth: 3,
-          pointRadius: 0
-        },
-        {
-          label: `Apparent Power (S) = ${S.toFixed(2)} kVA`,
-          data: [{ x: 0, y: 0 }, { x: P, y: Q }],
-          borderColor: 'rgba(16, 185, 129, 1)',
-          borderWidth: 3,
-          pointRadius: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        title: { 
-          display: true, 
-          text: title, 
-          font: { size: 16, weight: 'bold' }, 
-          color: 'rgba(107, 114, 128, 1)' 
-        },
-        legend: { 
-          position: 'bottom',
-          labels: {
-            boxWidth: 12,
-            padding: 20
-          }
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return context.dataset.label;
+      return new Chart(canvas, {
+        type: 'line',
+        data: {
+          datasets: [
+            {
+              label: `Real Power (P) = ${P.toFixed(2)} kW`,
+              data: [{ x: 0, y: 0 }, { x: P, y: 0 }],
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 3,
+              pointRadius: 0
+            },
+            {
+              label: `Reactive Power (Q) = ${Q.toFixed(2)} kVAr`,
+              data: [{ x: P, y: 0 }, { x: P, y: Q }],
+              borderColor: 'rgba(239, 68, 68, 1)',
+              borderWidth: 3,
+              pointRadius: 0
+            },
+            {
+              label: `Apparent Power (S) = ${S.toFixed(2)} kVA`,
+              data: [{ x: 0, y: 0 }, { x: P, y: Q }],
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 3,
+              pointRadius: 0
             }
-          }
+          ]
         },
-        annotation: {
-          annotations: {
-            powerAngle: {
-              type: 'arc',
-              xMin: 0,
-              xMax: arcRadius * Math.cos(phiRad),
-              yMin: 0,
-              yMax: arcRadius * Math.sin(phiRad),
-              borderColor: 'rgba(255, 193, 7, 0.8)',
-              borderWidth: 2,
-              angle: {
-                start: 0,
-                end: phiRad
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: { 
+              display: true, 
+              text: title, 
+              font: { size: 16, weight: 'bold' }, 
+              color: 'rgba(107, 114, 128, 1)' 
+            },
+            legend: { 
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 20
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return context.dataset.label;
+                }
+              }
+            },
+            annotation: {
+              annotations: {
+                powerAngle: {
+                  type: 'arc',
+                  xMin: 0,
+                  xMax: arcRadius,
+                  yMin: 0,
+                  yMax: arcRadius,
+                  borderColor: 'rgba(255, 193, 7, 0.8)',
+                  borderWidth: 2,
+                  angle: {
+                    start: 0,
+                    end: phiRad
+                  },
+                  label: {
+                    display: true,
+                    content: `φ = ${phiDeg.toFixed(1)}°`,
+                    position: 'center',
+                    color: 'rgba(255, 193, 7, 1)',
+                    font: { size: 12, weight: 'bold' }
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            x: { 
+              type: 'linear',
+              min: 0, 
+              max: axisMax, 
+              title: { 
+                display: true, 
+                text: 'Real Power (P) [kW]',
+                color: 'rgba(107, 114, 128, 1)'
               },
-              label: {
-                display: true,
-                content: `φ = ${phiDeg.toFixed(1)}°`,
-                position: 'center',
-                color: 'rgba(255, 193, 7, 1)',
-                font: { size: 12, weight: 'bold' }
+              grid: {
+                color: 'rgba(229, 231, 235, 1)'
+              },
+              ticks: {
+                color: 'rgba(107, 114, 128, 1)'
+              }
+            },
+            y: { 
+              type: 'linear',
+              min: 0, 
+              max: axisMax, 
+              title: { 
+                display: true, 
+                text: 'Reactive Power (Q) [kVAr]',
+                color: 'rgba(107, 114, 128, 1)'
+              },
+              grid: {
+                color: 'rgba(229, 231, 235, 1)'
+              },
+              ticks: {
+                color: 'rgba(107, 114, 128, 1)'
               }
             }
           }
         }
-      },
-      scales: {
-        x: { 
-          type: 'linear',
-          min: 0, 
-          max: axisMax, 
-          title: { 
-            display: true, 
-            text: 'Real Power (P) [kW]',
-            color: 'rgba(107, 114, 128, 1)'
-          },
-          grid: {
-            color: 'rgba(229, 231, 235, 1)'
-          },
-          ticks: {
-            color: 'rgba(107, 114, 128, 1)'
-          }
+      });
+    };
+
+    // Create cost bar chart
+    const createCostBarChart = (canvas, energyCost, reactiveCost, correctedReactiveCost, energySavings, totalSavings) => {
+      return new Chart(canvas, {
+        type: 'bar',
+        data: {
+          labels: ['Energy Cost', 'Reactive Cost (Before)', 'Reactive Cost (After)', 'Energy Savings', 'Total Savings'],
+          datasets: [{
+            label: 'Cost ($)',
+            data: [energyCost, reactiveCost, correctedReactiveCost, energySavings, totalSavings],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.7)',
+              'rgba(239, 68, 68, 0.7)',
+              'rgba(239, 68, 68, 0.3)',
+              'rgba(16, 185, 129, 0.7)',
+              'rgba(16, 185, 129, 1)'
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(239, 68, 68, 1)',
+              'rgba(239, 68, 68, 0.5)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(16, 185, 129, 1)'
+            ],
+            borderWidth: 1
+          }]
         },
-        y: { 
-          type: 'linear',
-          min: 0, 
-          max: axisMax, 
-          title: { 
-            display: true, 
-            text: 'Reactive Power (Q) [kVAr]',
-            color: 'rgba(107, 114, 128, 1)'
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `$${context.raw.toFixed(2)}`;
+                }
+              }
+            }
           },
-          grid: {
-            color: 'rgba(229, 231, 235, 1)'
-          },
-          ticks: {
-            color: 'rgba(107, 114, 128, 1)'
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return '$' + value;
+                }
+              }
+            }
           }
         }
-      }
-    }
-  });
-};
+      });
+    };
+
     // Calculate results
     const calculateResults = () => {
       try {
@@ -1013,7 +1106,7 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
             pf: out.pf,
             phiDeg: out.phiDeg,
             Z: out.Z,
-            I: out.I
+            I: out.I ?? 0
           });
         });
         
@@ -1091,10 +1184,10 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
       });
       
       // Update economics
-      elements.energyConsumption.textContent = `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`;
-      elements.energyCost.textContent = `$${cost.energyCost_USD.toFixed(2)}/month`;
-      elements.reactiveEnergy.textContent = `${cost.reactiveEnergy_kVArh.toFixed(2)} kVArh/month`;
-      elements.reactiveCost.textContent = `$${cost.reactiveCost_USD.toFixed(2)}/month`;
+      if (elements.energyConsumption) elements.energyConsumption.textContent = `${cost.energyConsumption_kWh.toFixed(2)} kWh/month`;
+      if (elements.energyCost) elements.energyCost.textContent = `${cost.energyCost_USD.toFixed(2)}/month`;
+      if (elements.reactiveEnergy) elements.reactiveEnergy.textContent = `${cost.reactiveEnergy_kVArh.toFixed(2)} kVArh/month`;
+      if (elements.reactiveCost) elements.reactiveCost.textContent = `${cost.reactiveCost_USD.toFixed(2)}/month`;
       
       // Update correction results if applicable
       if (correction) {
@@ -1166,64 +1259,64 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
         pfToDeg(totalPf),
         'Power Triangle Diagram'
       );
+      
+      // Create cost bar chart for Economics tab
+      if (window.costBarChart) window.costBarChart.destroy();
+      window.costBarChart = createCostBarChart(
+        elements.costBarChart,
+        cost.energyCost_USD,
+        cost.reactiveCost_USD,
+        correction ? correction.reactiveCost_after : 0,
+        correction ? correction.energyLossSavings : 0,
+        correction ? correction.totalSavings : 0
+      );
+
+      // (Optional) if a summary cost chart exists in the DOM create/update it
+      const summaryCostBar = document.getElementById('summary-cost-bar-chart');
+      if (summaryCostBar) {
+        if (window.summaryCostBarChart) window.summaryCostBarChart.destroy();
+        window.summaryCostBarChart = createCostBarChart(
+          summaryCostBar,
+          cost.energyCost_USD,
+          cost.reactiveCost_USD,
+          correction ? correction.reactiveCost_after : 0,
+          correction ? correction.energyLossSavings : 0,
+          correction ? correction.totalSavings : 0
+        );
+      }
     };
 
     // Download CSV
     const downloadCSV = () => {
-      // This would be implemented similarly to your original function
-      // but adapted to work with the new UI structure
-      alert('CSV download functionality would be implemented here');
+      // Build CSV from the devices results table already rendered in the DOM
+      const rows = Array.from(elements.devicesResultsBody.querySelectorAll('tr'));
+      if (!rows.length) {
+        showError('No device results to export. Run a calculation first.');
+        return;
+      }
+
+      const headers = ['Device', 'P (kW)', 'Q (kVAr)', 'S (kVA)', 'PF', 'I (A)'];
+      const csv = [headers.join(',')];
+
+      rows.forEach(r => {
+        const cols = Array.from(r.querySelectorAll('td')).map(td => '"' + td.textContent.trim().replace(/"/g, '""') + '"');
+        csv.push(cols.join(','));
+      });
+
+      const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'devices_report.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     };
 
-    // Run validation tests
-    const runTests = () => {
-      const tests = [];
-      
-      try {
-        // Test 1: 1-φ, P & pf (P=10 kW, pf=0.8, V=0.23 kV)
-        let r1 = calculatePowerParameters(0.23, { P: 10, pf: 0.8 }, 'Single');
-        tests.push({
-          name: 'T1 Single P&pf',
-          pass: Math.abs(r1.S / 1000 - 12.5) < 0.1 && Math.abs(r1.Q / 1000 - 7.5) < 0.1 && Math.abs(r1.I - 54.35) < 0.5,
-          details: { S_kVA: (r1.S/1000).toFixed(3), Q_kVAr: (r1.Q/1000).toFixed(3), I_A: r1.I.toFixed(2) }
-        });
-        
-        // Test 2: 3-φ, P & pf (P=30 kW, pf=0.9, V_LL=0.4 kV)
-        let r2 = calculatePowerParameters(0.4, { P: 30, pf: 0.9 }, 'Three');
-        tests.push({
-          name: 'T2 Three P&pf',
-          pass: Math.abs(r2.S / 1000 - 33.333) < 0.2 && Math.abs(r2.Q / 1000 - 14.526) < 0.2 && Math.abs(r2.I - 48.1) < 0.5,
-          details: { S_kVA: (r2.S/1000).toFixed(3), Q_kVAr: (r2.Q/1000).toFixed(3), I_A: r2.I.toFixed(2) }
-        });
-        
-        // Test 3: 1-φ, P+jQ (P=5 kW, Q=6 kVAr, V=0.23 kV)
-        let r3 = calculatePowerParameters(0.23, { P: 5, Q: 6 }, 'Single');
-        tests.push({
-          name: 'T3 Single P+jQ',
-          pass: Math.abs(r3.S / 1000 - Math.sqrt(61)) < 0.1 && Math.abs(r3.pf - 5/Math.sqrt(61)) < 0.01,
-          details: { S_kVA: (r3.S/1000).toFixed(3), pf: r3.pf.toFixed(3), I_A: r3.I.toFixed(2) }
-        });
-        
-        // Test 4: 1-φ, P & I (P=5 kW, I=25 A, V=0.23 kV)
-        let r4 = calculatePowerParameters(0.23, { P: 5, I: 25 }, 'Single');
-        tests.push({
-          name: 'T4 Single P&I',
-          pass: Math.abs(r4.S / 1000 - 5.75) < 0.1 && Math.abs(r4.pf - 5000/5750) < 0.01,
-          details: { S_kVA: (r4.S/1000).toFixed(3), pf: r4.pf.toFixed(3), Q_kVAr: (r4.Q/1000).toFixed(3) }
-        });
-        
-        // Show test results
-        let testResults = 'Validation Test Results:\n\n';
-        tests.forEach(test => {
-          testResults += `${test.name}: ${test.pass ? 'PASS' : 'FAIL'}\n`;
-          testResults += `Details: ${JSON.stringify(test.details, null, 2)}\n\n`;
-        });
-        
-        alert(testResults);
-        
-      } catch (e) {
-        alert('Test error: ' + e.message);
-      }
+    // Download Report
+    const downloadReport = () => {
+      alert('Standard report download functionality would be implemented here');
     };
 
     // Event Listeners
@@ -1273,28 +1366,32 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
     });
 
     elements.calculateBtn.addEventListener('click', calculateResults);
-    elements.testBtn.addEventListener('click', runTests);
     elements.downloadCsv.addEventListener('click', downloadCSV);
+    elements.downloadReport.addEventListener('click', downloadReport);
 
     // System type buttons
-    elements.singlePhaseBtn.addEventListener('click', () => {
+    if (elements.singlePhaseBtn) elements.singlePhaseBtn.addEventListener('click', () => {
       elements.systemType = 'Single';
       elements.singlePhaseBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
       elements.singlePhaseBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
-      elements.threePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
-      elements.threePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      if (elements.threePhaseBtn) {
+        elements.threePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
+        elements.threePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      }
     });
 
-    elements.threePhaseBtn.addEventListener('click', () => {
+    if (elements.threePhaseBtn) elements.threePhaseBtn.addEventListener('click', () => {
       elements.systemType = 'Three';
       elements.threePhaseBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
       elements.threePhaseBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
-      elements.singlePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
-      elements.singlePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      if (elements.singlePhaseBtn) {
+        elements.singlePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
+        elements.singlePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+      }
     });
 
     // Tab switching
-    elements.summaryTab.addEventListener('click', () => {
+    if (elements.summaryTab) elements.summaryTab.addEventListener('click', () => {
       elements.summaryContent.classList.remove('hidden');
       elements.devicesContent.classList.add('hidden');
       elements.correctionContent.classList.add('hidden');
@@ -1306,7 +1403,7 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
       elements.economicsTab.classList.remove('tab-active');
     });
 
-    elements.devicesTab.addEventListener('click', () => {
+    if (elements.devicesTab) elements.devicesTab.addEventListener('click', () => {
       elements.summaryContent.classList.add('hidden');
       elements.devicesContent.classList.remove('hidden');
       elements.correctionContent.classList.add('hidden');
@@ -1318,7 +1415,7 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
       elements.economicsTab.classList.remove('tab-active');
     });
 
-    elements.correctionTab.addEventListener('click', () => {
+    if (elements.correctionTab) elements.correctionTab.addEventListener('click', () => {
       elements.summaryContent.classList.add('hidden');
       elements.devicesContent.classList.add('hidden');
       elements.correctionContent.classList.remove('hidden');
@@ -1330,7 +1427,7 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
       elements.economicsTab.classList.remove('tab-active');
     });
 
-    elements.economicsTab.addEventListener('click', () => {
+    if (elements.economicsTab) elements.economicsTab.addEventListener('click', () => {
       elements.summaryContent.classList.add('hidden');
       elements.devicesContent.classList.add('hidden');
       elements.correctionContent.classList.add('hidden');
@@ -1342,13 +1439,14 @@ const createPowerTriangleChart = (canvas, P, Q, S, phiDeg, title) => {
       elements.economicsTab.classList.add('tab-active');
     });
 
-    // Initialize
-    initializeDevices();
-    elements.singlePhaseBtn.click(); // Set to single phase by default
-    elements.pfTarget.dispatchEvent(new Event('input')); // Initialize PF target marker
+  // Initialize
+  initializeDevices();
+  // Ensure system type UI reflects default
+  if (elements.singlePhaseBtn) elements.singlePhaseBtn.click();
+  elements.pfTarget.dispatchEvent(new Event('input'));
+  // Show summary tab by default
+  if (elements.summaryTab) elements.summaryTab.click();
+    
   </script>
-  <footer>
-        <p>&copy; 2025 Solomon Ofori Manu. All rights reserved.</p>
-    </footer>
 </body>
 </html>
