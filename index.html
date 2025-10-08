@@ -29,11 +29,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     .sidebar {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
     }
     .power-factor-indicator {
       height: 10px;
-      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+      background: linear-gradient(90deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
     }
     .power-factor-marker {
       position: absolute;
@@ -48,13 +48,17 @@
       width: 100%;
     }
     .tab-active {
-      border-bottom: 3px solid #3b82f6;
-      color: #3b82f6;
-      font-weight: 600;
+      border-bottom: 3px solid #dc2626;
+      color: #dc2626;
+      font-weight: 700;
     }
     .glow {
-      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      box-shadow: 0 6px 30px rgba(220,38,38,0.12);
     }
+    /* Text visibility improvements */
+    h1, h2, h3 { text-shadow: 0 1px 0 rgba(0,0,0,0.04); }
+    .result-value { font-weight: 800; color: #7f1d1d; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
+    .label-contrast { color: #3f3f46; font-weight: 600; }
     .result-card {
       transition: all 0.3s ease;
     }
@@ -71,14 +75,14 @@
       <div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex items-center">
-            <i class="fas fa-tint text-blue-500 text-3xl mr-3"></i>
+            <i class="fas fa-tint text-red-600 text-3xl mr-3"></i>
             <h1 class="text-2xl font-bold text-gray-900">EASOM Electricals</h1>
           </div>
           <div class="mt-4 md:mt-0 flex gap-4 items-center">
-            <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition">
+            <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-800 hover:bg-red-100 transition">
               <i class="fas fa-file-invoice-dollar mr-1"></i> Know Your Power Bill
             </a>
-            <button id="export-pdf-btn" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition">
+            <button id="export-pdf-btn" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 hover:bg-red-200 transition">
               <i class="fas fa-file-pdf mr-1"></i> Export PDF
             </button>
           </div>
@@ -94,7 +98,7 @@
           <h2 class="text-xl font-semibold mb-4 flex items-center">
             <i class="fas fa-sliders-h mr-2"></i> Input Parameters
           </h2>
-          <p class="mb-4 text-blue-100 text-sm">
+            <p class="mb-4 text-red-50 text-sm">
             <b>Instructions:</b> Enter your system and device details below. Use the values from your device's nameplate (label) for best results.<br>
           </p>
           
@@ -104,10 +108,10 @@
               <span title="Single phase is typical for homes, three phase for larger facilities." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
             </label>
             <div class="flex rounded-md shadow-sm">
-              <button id="single-phase-btn" class="flex-1 py-2 px-4 rounded-l-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <button id="single-phase-btn" class="flex-1 py-2 px-4 rounded-l-md bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
                 <i class="fas fa-bolt mr-1"></i> Single Phase
               </button>
-              <button id="three-phase-btn" class="flex-1 py-2 px-4 rounded-r-md bg-blue-800 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <button id="three-phase-btn" class="flex-1 py-2 px-4 rounded-r-md bg-red-800 hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500">
                 <i class="fas fa-bolt mr-1"></i> Three Phase
               </button>
             </div>
@@ -119,12 +123,12 @@
               <span title="Enter the voltage supplied to your system. For homes, it's usually 0.23kV (230V)." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
             </label>
             <div class="relative rounded-md shadow-sm">
-              <input type="number" id="voltage" value="0.23" min="0.1" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+              <input type="number" id="voltage" value="0.23" min="0.1" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
               <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <span class="text-gray-900">kV</span>
               </div>
             </div>
-            <p class="text-xs mt-1 text-blue-200">Single-phase RMS or 3φ line-to-line</p>
+            <p class="text-xs mt-1 text-red-300">Single-phase RMS or 3φ line-to-line</p>
           </div>
           
           <!-- Device Management -->
@@ -133,8 +137,8 @@
               <span title="How many devices (motors, pumps, etc.) are you analyzing?" class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
             </label>
             <div class="flex">
-              <input type="number" id="num-devices" value="1" min="1" class="w-full p-2 rounded-l text-gray-900 focus:ring-2 focus:ring-blue-500">
-              <button id="add-device-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-r focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="number" id="num-devices" value="1" min="1" class="w-full p-2 rounded-l text-gray-900 focus:ring-2 focus:ring-red-500">
+              <button id="add-device-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 rounded-r focus:outline-none focus:ring-2 focus:ring-red-500">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -145,7 +149,7 @@
             <!-- Device template will be inserted here -->
           </div>
           
-          <div class="mb-4 text-xs text-blue-100">
+          <div class="mb-4 text-xs text-orange-100">
             <i class="fas fa-info-circle"></i> <b>Device Parameters:</b>
             <ul class="list-disc ml-4">
               <li><b>Apparent Power (kVA)</b>: Look for "kVA" on your device's nameplate.</li>
@@ -162,7 +166,7 @@
             <label class="block text-sm font-medium mb-1">Power Factor Correction
               <span title="Improve efficiency and reduce costs by correcting power factor." class="ml-1 cursor-help"><i class="fas fa-info-circle"></i></span>
             </label>
-            <select id="pf-correction-select" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+            <select id="pf-correction-select" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-orange-500">
               <option value="no">No Correction</option>
               <option value="yes">Apply Correction</option>
             </select>
@@ -189,25 +193,25 @@
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="block text-xs mb-1">Utility Rate ($/kWh)</label>
-                <input type="number" id="utility-rate" value="0.12" min="0" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+                <input type="number" id="utility-rate" value="0.12" min="0" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
               </div>
               <div>
                 <label class="block text-xs mb-1">Reactive Charge ($/kVArh)</label>
-                <input type="number" id="reactive-rate" value="0.05" min="0" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+                <input type="number" id="reactive-rate" value="0.05" min="0" step="0.01" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
               </div>
               <div>
                 <label class="block text-xs mb-1">Hours/Day</label>
-                <input type="number" id="operating-hours" value="8" min="0" step="0.1" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+                <input type="number" id="operating-hours" value="8" min="0" step="0.1" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
               </div>
               <div>
                 <label class="block text-xs mb-1">Days/Month</label>
-                <input type="number" id="operating-days" value="30" min="0" step="1" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+                <input type="number" id="operating-days" value="30" min="0" step="1" class="w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
               </div>
             </div>
           </div>
           
           <!-- Calculate Button -->
-          <button id="calculate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <button id="calculate-btn" class="w-full bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
             <i class="fas fa-calculator mr-2"></i> Calculate Power & Costs
           </button>
         </div>
@@ -217,7 +221,7 @@
           <!-- Results Header -->
           <div class="bg-gray-50 px-6 py-4 border-b">
             <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-              <i class="fas fa-chart-bar text-blue-500 mr-2"></i> Analysis Results
+                    <i class="fas fa-chart-bar text-red-500 mr-2"></i> Analysis Results
             </h2>
           </div>
           
@@ -256,12 +260,12 @@
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="result-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                   <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-3">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600 mr-3">
                       <i class="fas fa-bolt text-xl"></i>
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Total Real Power</p>
-                      <p id="total-p" class="text-2xl font-semibold text-gray-800">0 kW</p>
+                      <p id="total-p" class="text-2xl font-semibold text-gray-800 result-value">0 kW</p>
                     </div>
                   </div>
                 </div>
@@ -272,7 +276,7 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Total Reactive Power</p>
-                      <p id="total-q" class="text-2xl font-semibold text-gray-800">0 kVAr</p>
+                      <p id="total-q" class="text-2xl font-semibold text-gray-800 result-value">0 kVAr</p>
                     </div>
                   </div>
                 </div>
@@ -283,7 +287,7 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Total Apparent Power</p>
-                      <p id="total-s" class="text-2xl font-semibold text-gray-800">0 kVA</p>
+                      <p id="total-s" class="text-2xl font-semibold text-gray-800 result-value">0 kVA</p>
                     </div>
                   </div>
                 </div>
@@ -297,7 +301,7 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Power Factor</p>
-                      <p id="total-pf" class="text-2xl font-semibold text-gray-800">0.00</p>
+                      <p id="total-pf" class="text-2xl font-semibold text-gray-800 result-value">0.00</p>
                     </div>
                   </div>
                   <div class="power-factor-indicator relative">
@@ -317,12 +321,12 @@
                     </div>
                     <div>
                       <p class="text-sm font-medium text-gray-500">Total Current</p>
-                      <p id="total-current" class="text-2xl font-semibold text-gray-800">0 A</p>
+                      <p id="total-current" class="text-2xl font-semibold text-gray-800 result-value">0 A</p>
                     </div>
                   </div>
                   <div class="mt-4">
                     <p class="text-sm font-medium text-gray-500">Equivalent Impedance</p>
-                    <p id="total-z" class="text-xl font-semibold text-gray-800">0 Ω</p>
+                      <p id="total-z" class="text-xl font-semibold text-gray-800 result-value">0 Ω</p>
                   </div>
                 </div>
               </div>
@@ -331,18 +335,18 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                 <div class="result-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                   <p class="text-sm font-medium text-gray-500">Energy Consumption</p>
-                  <p id="summary-energy-consumption" class="text-xl font-semibold text-gray-800">0 kWh/month</p>
+                  <p id="summary-energy-consumption" class="text-xl font-semibold text-gray-800 result-value">0 kWh/month</p>
                   <p class="text-xs text-gray-500 mt-2">Total electrical energy used per month by all devices (useful for billing).</p>
                   <p class="text-sm font-medium text-gray-500 mt-3">Energy Cost</p>
-                  <p id="summary-energy-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
+                  <p id="summary-energy-cost" class="text-xl font-semibold text-gray-800 result-value">$0/month</p>
                   <p class="text-xs text-gray-500 mt-2">Estimated monthly cost for consumed energy at your utility rate.</p>
                 </div>
                 <div class="result-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                   <p class="text-sm font-medium text-gray-500">Reactive Energy</p>
-                  <p id="summary-reactive-energy" class="text-xl font-semibold text-gray-800">0 kVArh/month</p>
+                  <p id="summary-reactive-energy" class="text-xl font-semibold text-gray-800 result-value">0 kVArh/month</p>
                   <p class="text-xs text-gray-500 mt-2">Reactive energy drawn by inductive loads — often charged separately by utilities.</p>
                   <p class="text-sm font-medium text-gray-500 mt-3">Reactive Cost</p>
-                  <p id="summary-reactive-cost" class="text-xl font-semibold text-gray-800">$0/month</p>
+                  <p id="summary-reactive-cost" class="text-xl font-semibold text-gray-800 result-value">$0/month</p>
                   <p class="text-xs text-gray-500 mt-2">Estimated monthly reactive energy charge at your reactive rate.</p>
                 </div>
               </div>
@@ -379,7 +383,7 @@
                       </tr>
                       <tr>
                         <td class="px-4 py-2 font-medium">Total Potential Savings</td>
-                        <td id="tbl-total-savings" class="px-4 py-2 font-semibold text-blue-800">$0/month</td>
+                        <td id="tbl-total-savings" class="px-4 py-2 font-semibold text-red-800">$0/month</td>
                       </tr>
                     </tbody>
                   </table>
@@ -423,7 +427,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                   <!-- Power triangle for devices removed here; shown only in PF Correction section per user request -->
-                  <button id="download-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                  <button id="download-csv" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
                     <i class="fas fa-download mr-2"></i> Download CSV
                   </button>
                 </div>
@@ -858,7 +862,7 @@
 
     // Device template
     const deviceTemplate = (index) => `
-      <div class="device bg-blue-900 bg-opacity-20 p-4 rounded-lg" data-index="${index}">
+  <div class="device bg-red-900 bg-opacity-10 p-4 rounded-lg" data-index="${index}">
         <div class="flex justify-between items-center mb-2">
           <h3 class="font-medium">Device ${index + 1}</h3>
           <button class="remove-device text-red-400 hover:text-red-300 text-sm" data-index="${index}">
@@ -868,7 +872,7 @@
         
         <div class="mb-3">
           <label class="block text-sm font-medium mb-1">Equipment Type</label>
-          <select class="equipment-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+          <select class="equipment-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
             <option value="Motor">Motor</option>
             <option value="Pump">Pump</option>
             <option value="HVAC">HVAC (AC / Heat Pump)</option>
@@ -884,7 +888,7 @@
         
         <div class="mb-3">
           <label class="block text-sm font-medium mb-1">Nameplate Parameter Type</label>
-          <select class="load-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500">
+          <select class="load-type w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500">
             <option value="S & pf">kVA & Power Factor</option>
             <option value="P & pf">kW & Power Factor</option>
             <option value="P+jQ">kW & kVAr</option>
@@ -903,41 +907,41 @@
       'S & pf': `
         <div>
           <label class="block text-sm font-medium mb-1">Apparent Power (kVA)</label>
-          <input type="number" class="s-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="s-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" step="0.1">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Power Factor (0 < pf ≤ 1)</label>
-          <input type="number" class="pf-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" max="1" step="0.01" value="0.9">
+          <input type="number" class="pf-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" max="1" step="0.01" value="0.9">
         </div>
       `,
       'P & pf': `
         <div>
           <label class="block text-sm font-medium mb-1">Real Power (kW)</label>
-          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" step="0.1">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Power Factor (0 < pf ≤ 1)</label>
-          <input type="number" class="pf-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" max="1" step="0.01" value="0.9">
+          <input type="number" class="pf-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-orange-500" min="0" max="1" step="0.01" value="0.9">
         </div>
       `,
       'P+jQ': `
         <div>
           <label class="block text-sm font-medium mb-1">Real Power (kW)</label>
-          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-orange-500" min="0" step="0.1">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Reactive Power (kVAr)</label>
-          <input type="number" class="q-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="q-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" step="0.1">
         </div>
       `,
       'P & I': `
         <div>
           <label class="block text-sm font-medium mb-1">Real Power (kW)</label>
-          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="p-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" step="0.1">
         </div>
         <div>
           <label class="block text-sm font-medium mb-1">Current (A)</label>
-          <input type="number" class="i-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-blue-500" min="0" step="0.1">
+          <input type="number" class="i-value w-full p-2 rounded text-gray-900 focus:ring-2 focus:ring-red-500" min="0" step="0.1">
         </div>
       `
     };
@@ -1621,21 +1625,21 @@
     // System type buttons
     if (elements.singlePhaseBtn) elements.singlePhaseBtn.addEventListener('click', () => {
       elements.systemType = 'Single';
-      elements.singlePhaseBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      elements.singlePhaseBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+  elements.singlePhaseBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+  elements.singlePhaseBtn.classList.remove('bg-red-800', 'hover:bg-red-900');
       if (elements.threePhaseBtn) {
-        elements.threePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
-        elements.threePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+  elements.threePhaseBtn.classList.add('bg-red-800', 'hover:bg-red-900');
+  elements.threePhaseBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
       }
     });
 
     if (elements.threePhaseBtn) elements.threePhaseBtn.addEventListener('click', () => {
       elements.systemType = 'Three';
-      elements.threePhaseBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-      elements.threePhaseBtn.classList.remove('bg-blue-800', 'hover:bg-blue-900');
+  elements.threePhaseBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+  elements.threePhaseBtn.classList.remove('bg-red-800', 'hover:bg-red-900');
       if (elements.singlePhaseBtn) {
-        elements.singlePhaseBtn.classList.add('bg-blue-800', 'hover:bg-blue-900');
-        elements.singlePhaseBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+  elements.singlePhaseBtn.classList.add('bg-red-800', 'hover:bg-red-900');
+  elements.singlePhaseBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
       }
     });
 
