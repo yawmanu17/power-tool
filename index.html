@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PowerSo — Home of smarter power</title>
+  <title>EASOM Electricals — Home of smarter power</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- html2canvas + jsPDF for PDF export -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Chart.js Annotation Plugin -->
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@4.0.1"></script>
   <script>
@@ -69,12 +72,15 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex items-center">
             <i class="fas fa-tint text-blue-500 text-3xl mr-3"></i>
-            <h1 class="text-2xl font-bold text-gray-900">PowerSo</h1>
+            <h1 class="text-2xl font-bold text-gray-900">EASOM Electricals</h1>
           </div>
           <div class="mt-4 md:mt-0 flex gap-4 items-center">
             <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 hover:bg-blue-200 transition">
               <i class="fas fa-file-invoice-dollar mr-1"></i> Know Your Power Bill
             </a>
+            <button id="export-pdf-btn" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 hover:bg-green-200 transition">
+              <i class="fas fa-file-pdf mr-1"></i> Export PDF
+            </button>
           </div>
         </div>
       </div>
@@ -524,7 +530,19 @@
     const safeHide = (el) => { if (el && el.classList) el.classList.add('hidden'); };
 
     // Local storage helpers
-    const STORAGE_KEY = 'powerwise_state_v1';
+    let STORAGE_KEY = 'powerso_state_v1';
+    const LEGACY_STORAGE_KEY = 'powerwise_state_v1';
+
+    const migrateStorageKeyIfNeeded = () => {
+      try {
+        const newVal = localStorage.getItem(STORAGE_KEY);
+        const oldVal = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (!newVal && oldVal) {
+          localStorage.setItem(STORAGE_KEY, oldVal);
+          console.info('Migrated power state from legacy key to new key.');
+        }
+      } catch (e) { console.warn('Migration failed', e); }
+    };
     const saveState = (state) => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -532,7 +550,9 @@
     };
     const loadState = () => {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        // run migration before reading so we prefer the new key but will read legacy if present
+        migrateStorageKeyIfNeeded();
+        const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
         return raw ? JSON.parse(raw) : null;
       } catch (e) { console.warn('Could not load state', e); return null; }
     };
@@ -1520,8 +1540,31 @@
 
     // Download Report
     const downloadReport = () => {
-      alert('Standard report download functionality would be implemented here');
+      // Export the visible report (main content) as PDF using html2canvas + jsPDF if available.
+      exportPdfPower();
     };
+
+  // Export PDF for EASOM Electricals report (captures the main content area)
+    async function exportPdfPower() {
+      try {
+        if (typeof html2canvas === 'undefined' || !window.jspdf) {
+          // fallback to print dialog
+          return window.print();
+        }
+
+        const container = document.querySelector('main') || document.body;
+        const canvas = await html2canvas(container, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new window.jspdf.jsPDF({ unit: 'pt', format: 'a4' });
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  pdf.save('EASOM_Electricals_Report.pdf');
+      } catch (err) {
+        console.warn('PDF export failed, falling back to print', err);
+        window.print();
+      }
+    }
 
     // Event Listeners
     elements.addDeviceBtn.addEventListener('click', () => {
@@ -1663,7 +1706,7 @@
   </script>
   <!-- Footer -->
   <footer class="mt-8 text-center text-xs text-gray-500 pb-8">
-    <div>Built by Solomon Ofori Manu. <span class="font-semibold">PowerSo</span>™ — Home of smarter power.</div>
+  <div>Built by Solomon Ofori Manu. <span class="font-semibold">EASOM Electricals</span>™ — Home of smarter power.</div>
     <div class="mt-1">All rights reserved.</div>
   </footer>
 </body>
