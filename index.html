@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EASOM Electricals — Home of smarter power</title>
+  <title>OFORI Electricals — Home of smarter power</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Chart.js -->
@@ -76,7 +76,7 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex items-center">
             <i class="fas fa-tint text-red-600 text-3xl mr-3"></i>
-            <h1 class="text-2xl font-bold text-gray-900">EASOM Electricals</h1>
+            <h1 class="text-2xl font-bold text-gray-900">OFORI Electricals</h1>
           </div>
           <div class="mt-4 md:mt-0 flex gap-4 items-center">
             <a href="powerbill.html" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-50 text-red-800 hover:bg-red-100 transition">
@@ -1548,7 +1548,7 @@
       exportPdfPower();
     };
 
-  // Export PDF for EASOM Electricals report (captures the main content area)
+  // Export PDF for OFORI Electricals report (captures the main content area)
     async function exportPdfPower() {
       try {
         if (typeof html2canvas === 'undefined' || !window.jspdf) {
@@ -1563,7 +1563,7 @@
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-  pdf.save('EASOM_Electricals_Report.pdf');
+  pdf.save('OFORI_Electricals_Report.pdf');
       } catch (err) {
         console.warn('PDF export failed, falling back to print', err);
         window.print();
@@ -1710,7 +1710,7 @@
   </script>
   <!-- Footer -->
   <footer class="mt-8 text-center text-xs text-gray-500 pb-8">
-  <div>Built by Solomon Ofori Manu. <span class="font-semibold">EASOM Electricals</span>™ — Home of smarter power.</div>
+  <div>Built by Solomon Ofori Manu. <span class="font-semibold">OFORI Electricals</span>™ — Home of smarter power.</div>
     <div class="mt-1">All rights reserved.</div>
   </footer>
 </body>
