@@ -62,8 +62,8 @@ p {
 
 h1 {
   margin-bottom: 8px;
-  font-size: clamp(1.8rem, 4vw, 3.2rem);
-  line-height: 1;
+  font-size: clamp(1.45rem, 2.8vw, 2.35rem);
+  line-height: 1.08;
 }
 
 h2 {
@@ -82,7 +82,8 @@ h2 {
 .header-actions,
 .section-heading,
 .load-card-header,
-.tabs {
+.tabs,
+.input-tabs {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -145,10 +146,37 @@ h2 {
   padding: 18px;
 }
 
-.input-panel section + section {
-  border-top: 1px solid var(--line);
-  margin-top: 18px;
-  padding-top: 18px;
+.input-tabs {
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.input-tabs button {
+  flex: 1 1 auto;
+  min-width: 92px;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.input-tabs button.active {
+  background: var(--accent-soft);
+  border-color: #f0c7c1;
+  color: var(--accent-strong);
+}
+
+.input-section {
+  display: none;
+}
+
+.input-section.active {
+  display: block;
 }
 
 .section-heading {
@@ -233,6 +261,21 @@ a:focus-visible {
 .load-list {
   display: grid;
   gap: 12px;
+}
+
+.empty-note {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--soft);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .load-card {
@@ -442,6 +485,36 @@ td {
   .metric-grid,
   .chart-row {
     grid-template-columns: 1fr;
+  }
+
+  .app-header {
+    padding-top: 18px;
+  }
+
+  .lede {
+    font-size: 0.95rem;
+  }
+
+  .input-panel,
+  .tab-panel {
+    padding: 14px;
+  }
+
+  .input-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .input-tabs button {
+    min-width: 0;
+  }
+
+  .metric-grid article {
+    min-height: 104px;
+  }
+
+  .chart-frame {
+    height: 260px;
   }
 
   .app-footer {

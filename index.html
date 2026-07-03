@@ -12,7 +12,7 @@
   <header class="app-header">
     <div>
       <p class="eyebrow">OFORI Electricals</p>
-      <h1>Power Factor, Load, Cost, and Harmonics Analysis</h1>
+      <h1>Power Quality Analysis Tool</h1>
       <p class="lede">A professional engineering worksheet for distinguishing displacement power factor, true power factor, reactive demand, harmonic distortion, and correction needs.</p>
     </div>
     <nav class="header-actions" aria-label="Primary actions">
@@ -24,51 +24,60 @@
 
   <main class="app-shell">
     <aside class="input-panel" aria-label="Analysis inputs">
-      <section>
+      <nav class="input-tabs" aria-label="Input sections">
+        <button class="active" type="button" data-input-tab="system">System</button>
+        <button type="button" data-input-tab="loads">Loads</button>
+        <button type="button" data-input-tab="correction">Correction</button>
+        <button type="button" data-input-tab="economics">Economics</button>
+        <button type="button" data-input-tab="harmonics">Harmonics</button>
+      </nav>
+
+      <section class="input-section active" id="system-input">
         <h2>System</h2>
         <div class="segmented-control" role="group" aria-label="System type">
           <button type="button" class="active" data-system="single">Single Phase</button>
           <button type="button" data-system="three">Three Phase</button>
         </div>
         <div class="field-grid">
-          <label>Voltage <span>kV RMS</span><input id="voltage" type="number" min="0.01" step="0.01" value="0.23"></label>
-          <label>Frequency <span>Hz</span><input id="frequency" type="number" min="1" step="1" value="50"></label>
+          <label>Voltage <span>kV RMS</span><input id="voltage" type="number" min="0.01" step="0.01" placeholder="0.23"></label>
+          <label>Frequency <span>Hz</span><input id="frequency" type="number" min="1" step="1" placeholder="50"></label>
         </div>
       </section>
 
-      <section>
+      <section class="input-section" id="loads-input">
         <div class="section-heading">
           <h2>Loads</h2>
           <button type="button" class="small-button" id="add-load">Add Load</button>
         </div>
+        <p id="load-empty" class="empty-note">No loads added yet. Use Add Load to start an analysis.</p>
         <div id="load-list" class="load-list"></div>
       </section>
 
-      <section>
+      <section class="input-section" id="correction-input">
         <h2>Correction Target</h2>
         <div class="field-grid">
-          <label>Target PF <span>cos phi</span><input id="target-pf" type="number" min="0.8" max="1" step="0.01" value="0.95"></label>
-          <label>Capacitor Cost <span>USD / kVAr</span><input id="capacitor-cost" type="number" min="0" step="1" value="18"></label>
+          <label>Target PF <span>cos phi</span><input id="target-pf" type="number" min="0.8" max="1" step="0.01" placeholder="0.95"></label>
+          <label>Capacitor Cost <span>USD / kVAr</span><input id="capacitor-cost" type="number" min="0" step="1" placeholder="18"></label>
         </div>
       </section>
 
-      <section>
+      <section class="input-section" id="economics-input">
         <h2>Economics</h2>
         <div class="field-grid">
-          <label>Energy Rate <span>USD / kWh</span><input id="energy-rate" type="number" min="0" step="0.01" value="0.12"></label>
-          <label>Reactive Rate <span>USD / kVArh</span><input id="reactive-rate" type="number" min="0" step="0.01" value="0.05"></label>
-          <label>Hours / Day<input id="hours-day" type="number" min="0" step="0.1" value="8"></label>
-          <label>Days / Month<input id="days-month" type="number" min="0" step="1" value="30"></label>
+          <label>Energy Rate <span>USD / kWh</span><input id="energy-rate" type="number" min="0" step="0.01" placeholder="0.12"></label>
+          <label>Reactive Rate <span>USD / kVArh</span><input id="reactive-rate" type="number" min="0" step="0.01" placeholder="0.05"></label>
+          <label>Hours / Day<input id="hours-day" type="number" min="0" step="0.1" placeholder="8"></label>
+          <label>Days / Month<input id="days-month" type="number" min="0" step="1" placeholder="30"></label>
         </div>
       </section>
 
-      <section>
+      <section class="input-section" id="harmonics-input">
         <h2>Harmonics</h2>
         <div class="field-grid">
-          <label>Voltage THD <span>%</span><input id="voltage-thd" type="number" min="0" step="0.1" value="2.5"></label>
-          <label>Current THD <span>%</span><input id="current-thd" type="number" min="0" step="0.1" value="12"></label>
-          <label>Dominant Harmonic<input id="dominant-harmonic" type="number" min="2" step="1" value="5"></label>
-          <label>Nonlinear Load Share <span>%</span><input id="nonlinear-share" type="number" min="0" max="100" step="1" value="35"></label>
+          <label>Voltage THD <span>%</span><input id="voltage-thd" type="number" min="0" step="0.1" placeholder="2.5"></label>
+          <label>Current THD <span>%</span><input id="current-thd" type="number" min="0" step="0.1" placeholder="12"></label>
+          <label>Dominant Harmonic<input id="dominant-harmonic" type="number" min="2" step="1" placeholder="5"></label>
+          <label>Nonlinear Load Share <span>%</span><input id="nonlinear-share" type="number" min="0" max="100" step="1" placeholder="35"></label>
         </div>
         <label class="checkbox-row"><input id="detuned-bank" type="checkbox"> Detuned capacitor bank planned</label>
       </section>
@@ -153,17 +162,17 @@
   <template id="load-template">
     <article class="load-card">
       <div class="load-card-header">
-        <input class="load-name" type="text" value="Motor Load" aria-label="Load name">
+        <input class="load-name" type="text" placeholder="Load name" aria-label="Load name">
         <button type="button" class="remove-load" title="Remove load">Remove</button>
       </div>
       <div class="field-grid">
         <label>Load Type<select class="load-type"><option>Motor</option><option>Pump</option><option>Lighting</option><option>VFD</option><option>Transformer</option><option>Other</option></select></label>
         <label>Input Mode<select class="input-mode"><option value="p-pf">kW + PF</option><option value="s-pf">kVA + PF</option><option value="p-q">kW + kVAr</option><option value="p-i">kW + Current</option></select></label>
-        <label>Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01" value="7.5"></label>
-        <label>Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01" value="0.82"></label>
-        <label>Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01" value="9.15"></label>
-        <label>Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01" value="5.24"></label>
-        <label>Current <span>A</span><input class="load-i" type="number" min="0" step="0.01" value="39.8"></label>
+        <label>Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01" placeholder="7.5"></label>
+        <label>Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01" placeholder="0.82"></label>
+        <label>Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01" placeholder="9.15"></label>
+        <label>Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01" placeholder="5.24"></label>
+        <label>Current <span>A</span><input class="load-i" type="number" min="0" step="0.01" placeholder="39.8"></label>
       </div>
     </article>
   </template>

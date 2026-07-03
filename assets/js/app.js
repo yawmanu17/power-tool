@@ -1,37 +1,41 @@
 import { calculateAnalysis } from "./power-model.js";
-import { loadState, saveState, exportState } from "./storage.js";
+import { saveState, exportState } from "./storage.js";
 import { renderCharts } from "./charts.js";
 import { buildReportState, createExecutiveSummary, formatCurrency, formatNumber } from "./reporting.js";
 
 const defaultState = {
   systemType: "single",
-  voltageKv: 0.23,
-  frequencyHz: 50,
-  targetPf: 0.95,
-  capacitorCost: 18,
-  energyRate: 0.12,
-  reactiveRate: 0.05,
-  hoursDay: 8,
-  daysMonth: 30,
+  voltageKv: "",
+  frequencyHz: "",
+  targetPf: "",
+  capacitorCost: "",
+  energyRate: "",
+  reactiveRate: "",
+  hoursDay: "",
+  daysMonth: "",
   harmonics: {
-    voltageThd: 2.5,
-    currentThd: 12,
-    dominantHarmonic: 5,
-    nonlinearShare: 35,
+    voltageThd: "",
+    currentThd: "",
+    dominantHarmonic: "",
+    nonlinearShare: "",
     detunedBank: false
   },
-  loads: [{
+  loads: []
+};
+
+function createBlankLoad(name = "Load") {
+  return {
     id: crypto.randomUUID(),
-    name: "Motor Load",
+    name,
     type: "Motor",
     mode: "p-pf",
-    pKw: 7.5,
-    pf: 0.82,
-    sKva: 9.15,
-    qKvar: 5.24,
-    currentA: 39.8
-  }]
-};
+    pKw: "",
+    pf: "",
+    sKva: "",
+    qKvar: "",
+    currentA: ""
+  };
+}
 
 const dom = {
   loadList: document.getElementById("load-list"),
@@ -39,7 +43,7 @@ const dom = {
   error: document.getElementById("error-message")
 };
 
-let state = normalizeState(loadState() || defaultState);
+let state = normalizeState(defaultState);
 let latestAnalysis;
 
 init();
@@ -63,13 +67,14 @@ function bindStaticEvents() {
     button.addEventListener("click", () => showTab(button.dataset.tab));
   });
 
+  document.querySelectorAll("[data-input-tab]").forEach((button) => {
+    button.addEventListener("click", () => showInputTab(button.dataset.inputTab));
+  });
+
   document.getElementById("add-load").addEventListener("click", () => {
-    state.loads.push({
-      ...defaultState.loads[0],
-      id: crypto.randomUUID(),
-      name: `Load ${state.loads.length + 1}`
-    });
+    state.loads.push(createBlankLoad(`Load ${state.loads.length + 1}`));
     renderLoads();
+    showInputTab("loads");
     calculateAndRender();
   });
 
@@ -118,6 +123,7 @@ function renderSystemButtons() {
 
 function renderLoads() {
   dom.loadList.innerHTML = "";
+  document.getElementById("load-empty").classList.toggle("hidden", state.loads.length > 0);
   state.loads.forEach((load, index) => {
     const node = dom.template.content.firstElementChild.cloneNode(true);
     node.dataset.loadId = load.id;
@@ -129,7 +135,6 @@ function renderLoads() {
     node.querySelector(".load-s").value = load.sKva;
     node.querySelector(".load-q").value = load.qKvar;
     node.querySelector(".load-i").value = load.currentA;
-    node.querySelector(".remove-load").disabled = state.loads.length === 1;
     node.querySelector(".remove-load").addEventListener("click", () => {
       state.loads = state.loads.filter((item) => item.id !== load.id);
       renderLoads();
@@ -245,15 +250,23 @@ function showTab(tab) {
   document.getElementById(`${tab}-panel`).classList.add("active");
 }
 
+function showInputTab(tab) {
+  document.querySelectorAll("[data-input-tab]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.inputTab === tab);
+  });
+  document.querySelectorAll(".input-section").forEach((section) => section.classList.remove("active"));
+  document.getElementById(`${tab}-input`).classList.add("active");
+}
+
 function normalizeState(raw) {
   const merged = structuredClone(defaultState);
   Object.assign(merged, raw || {});
   merged.harmonics = { ...defaultState.harmonics, ...(raw?.harmonics || {}) };
   merged.loads = Array.isArray(raw?.loads) && raw.loads.length ? raw.loads.map((load) => ({
-    ...defaultState.loads[0],
+    ...createBlankLoad(),
     ...load,
     id: load.id || crypto.randomUUID()
-  })) : defaultState.loads;
+  })) : [];
   return merged;
 }
 
