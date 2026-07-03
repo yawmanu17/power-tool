@@ -39,8 +39,46 @@
           <button type="button" data-system="three">Three Phase</button>
         </div>
         <div class="field-grid">
-          <label>Voltage <span>kV RMS</span><input id="voltage" type="number" min="0.01" step="0.01" placeholder="0.23"></label>
-          <label>Frequency <span>Hz</span><input id="frequency" type="number" min="1" step="1" placeholder="50"></label>
+          <label>Voltage Class
+            <select id="voltage-preset">
+              <option value="">Select voltage</option>
+              <optgroup label="LV single phase">
+                <option value="0.12">120 V</option>
+                <option value="0.23">230 V</option>
+                <option value="0.24">240 V</option>
+              </optgroup>
+              <optgroup label="LV three phase">
+                <option value="0.208">208 V</option>
+                <option value="0.4">400 V</option>
+                <option value="0.415">415 V</option>
+                <option value="0.48">480 V</option>
+                <option value="0.6">600 V</option>
+              </optgroup>
+              <optgroup label="MV">
+                <option value="3.3">3.3 kV</option>
+                <option value="4.16">4.16 kV</option>
+                <option value="6.6">6.6 kV</option>
+                <option value="11">11 kV</option>
+                <option value="13.8">13.8 kV</option>
+                <option value="33">33 kV</option>
+              </optgroup>
+            </select>
+          </label>
+          <label>Custom Voltage <span>kV RMS</span><input id="voltage" type="number" min="0.01" step="0.001"></label>
+          <label>Frequency
+            <select id="frequency">
+              <option value="">Select frequency</option>
+              <option value="50">50 Hz</option>
+              <option value="60">60 Hz</option>
+            </select>
+          </label>
+          <label>Study Basis
+            <select id="study-basis">
+              <option value="nameplate">Nameplate screening</option>
+              <option value="measured">Measured field data</option>
+              <option value="utility">Utility bill review</option>
+            </select>
+          </label>
         </div>
       </section>
 
@@ -56,28 +94,28 @@
       <section class="input-section" id="correction-input">
         <h2>Correction Target</h2>
         <div class="field-grid">
-          <label>Target PF <span>cos phi</span><input id="target-pf" type="number" min="0.8" max="1" step="0.01" placeholder="0.95"></label>
-          <label>Capacitor Cost <span>USD / kVAr</span><input id="capacitor-cost" type="number" min="0" step="1" placeholder="18"></label>
+          <label>Target PF <span>cos phi</span><input id="target-pf" type="number" min="0.8" max="1" step="0.01"></label>
+          <label>Capacitor Cost <span>USD / kVAr</span><input id="capacitor-cost" type="number" min="0" step="1"></label>
         </div>
       </section>
 
       <section class="input-section" id="economics-input">
         <h2>Economics</h2>
         <div class="field-grid">
-          <label>Energy Rate <span>USD / kWh</span><input id="energy-rate" type="number" min="0" step="0.01" placeholder="0.12"></label>
-          <label>Reactive Rate <span>USD / kVArh</span><input id="reactive-rate" type="number" min="0" step="0.01" placeholder="0.05"></label>
-          <label>Hours / Day<input id="hours-day" type="number" min="0" step="0.1" placeholder="8"></label>
-          <label>Days / Month<input id="days-month" type="number" min="0" step="1" placeholder="30"></label>
+          <label>Energy Rate <span>USD / kWh</span><input id="energy-rate" type="number" min="0" step="0.01"></label>
+          <label>Reactive Rate <span>USD / kVArh</span><input id="reactive-rate" type="number" min="0" step="0.01"></label>
+          <label>Hours / Day<input id="hours-day" type="number" min="0" step="0.1"></label>
+          <label>Days / Month<input id="days-month" type="number" min="0" step="1"></label>
         </div>
       </section>
 
       <section class="input-section" id="harmonics-input">
         <h2>Harmonics</h2>
         <div class="field-grid">
-          <label>Voltage THD <span>%</span><input id="voltage-thd" type="number" min="0" step="0.1" placeholder="2.5"></label>
-          <label>Current THD <span>%</span><input id="current-thd" type="number" min="0" step="0.1" placeholder="12"></label>
-          <label>Dominant Harmonic<input id="dominant-harmonic" type="number" min="2" step="1" placeholder="5"></label>
-          <label>Nonlinear Load Share <span>%</span><input id="nonlinear-share" type="number" min="0" max="100" step="1" placeholder="35"></label>
+          <label>Voltage THD <span>%</span><input id="voltage-thd" type="number" min="0" step="0.1"></label>
+          <label>Current THD <span>%</span><input id="current-thd" type="number" min="0" step="0.1"></label>
+          <label>Dominant Harmonic<input id="dominant-harmonic" type="number" min="2" step="1"></label>
+          <label>Nonlinear Load Share <span>%</span><input id="nonlinear-share" type="number" min="0" max="100" step="1"></label>
         </div>
         <label class="checkbox-row"><input id="detuned-bank" type="checkbox"> Detuned capacitor bank planned</label>
       </section>
@@ -128,6 +166,10 @@
           <article><span>Monthly Savings</span><strong id="monthly-savings">$0.00</strong><small>Reactive charge plus loss estimate</small></article>
           <article><span>Simple Payback</span><strong id="payback">N/A</strong><small>Based on capacitor budget</small></article>
         </div>
+        <div class="chart-row">
+          <div class="chart-frame"><canvas id="before-correction-triangle"></canvas></div>
+          <div class="chart-frame"><canvas id="after-correction-triangle"></canvas></div>
+        </div>
         <p class="note">Correction sizing is based on fundamental reactive power. For harmonic-rich systems, use detuned or filtered capacitor banks after a site power-quality study.</p>
       </section>
 
@@ -140,6 +182,7 @@
           <article><span>Transformer K-Factor</span><strong id="k-factor">1.00</strong><small>Screening estimate</small></article>
           <article><span>Risk Level</span><strong id="harmonic-risk">Low</strong><small id="harmonic-action">No immediate concern</small></article>
         </div>
+        <div class="chart-frame wide-chart"><canvas id="harmonic-waveform-chart"></canvas></div>
         <div class="table-wrap">
           <table>
             <thead><tr><th>Distinction</th><th>Meaning</th><th>Why it matters</th></tr></thead>
@@ -162,17 +205,43 @@
   <template id="load-template">
     <article class="load-card">
       <div class="load-card-header">
-        <input class="load-name" type="text" placeholder="Load name" aria-label="Load name">
+        <input class="load-name" type="text" aria-label="Load name">
         <button type="button" class="remove-load" title="Remove load">Remove</button>
       </div>
       <div class="field-grid">
-        <label>Load Type<select class="load-type"><option>Motor</option><option>Pump</option><option>Lighting</option><option>VFD</option><option>Transformer</option><option>Other</option></select></label>
-        <label>Input Mode<select class="input-mode"><option value="p-pf">kW + PF</option><option value="s-pf">kVA + PF</option><option value="p-q">kW + kVAr</option><option value="p-i">kW + Current</option></select></label>
-        <label>Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01" placeholder="7.5"></label>
-        <label>Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01" placeholder="0.82"></label>
-        <label>Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01" placeholder="9.15"></label>
-        <label>Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01" placeholder="5.24"></label>
-        <label>Current <span>A</span><input class="load-i" type="number" min="0" step="0.01" placeholder="39.8"></label>
+        <label>Equipment Type
+          <select class="load-type">
+            <option>Motor</option>
+            <option>Pump</option>
+            <option>Fan/Blower</option>
+            <option>Compressor</option>
+            <option>VFD/Drive</option>
+            <option>Transformer</option>
+            <option>Welder</option>
+            <option>Lighting</option>
+            <option>Heater</option>
+            <option>Panel/Feeder</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Nameplate Method
+          <select class="input-mode">
+            <option value="motor-hp">Motor HP + Eff + PF</option>
+            <option value="kw-pf">kW + PF</option>
+            <option value="kva-pf">kVA + PF</option>
+            <option value="kw-kvar">kW + kVAr</option>
+            <option value="current-pf">Current + Voltage + PF</option>
+          </select>
+        </label>
+        <label>Motor Rating <span>HP</span><input class="load-hp" type="number" min="0" step="0.01"></label>
+        <label>Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01"></label>
+        <label>Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01"></label>
+        <label>Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01"></label>
+        <label>Current <span>A</span><input class="load-i" type="number" min="0" step="0.01"></label>
+        <label>Equipment Voltage <span>kV optional</span><input class="load-voltage" type="number" min="0" step="0.001"></label>
+        <label>Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01"></label>
+        <label>Efficiency <span>%</span><input class="load-efficiency" type="number" min="1" max="100" step="0.1"></label>
+        <label>Demand Factor <span>%</span><input class="load-demand" type="number" min="0" max="100" step="1"></label>
       </div>
     </article>
   </template>

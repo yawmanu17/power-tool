@@ -5,8 +5,10 @@ import { buildReportState, createExecutiveSummary, formatCurrency, formatNumber 
 
 const defaultState = {
   systemType: "single",
+  voltagePreset: "",
   voltageKv: "",
   frequencyHz: "",
+  studyBasis: "nameplate",
   targetPf: "",
   capacitorCost: "",
   energyRate: "",
@@ -28,12 +30,16 @@ function createBlankLoad(name = "Load") {
     id: crypto.randomUUID(),
     name,
     type: "Motor",
-    mode: "p-pf",
+    mode: "motor-hp",
+    hp: "",
     pKw: "",
     pf: "",
     sKva: "",
     qKvar: "",
-    currentA: ""
+    currentA: "",
+    voltageKv: "",
+    efficiencyPct: "",
+    demandPct: ""
   };
 }
 
@@ -85,12 +91,15 @@ function bindStaticEvents() {
   });
 
   [
-    "voltage", "frequency", "target-pf", "capacitor-cost", "energy-rate",
+    "voltage-preset", "voltage", "frequency", "study-basis", "target-pf", "capacitor-cost", "energy-rate",
     "reactive-rate", "hours-day", "days-month", "voltage-thd",
     "current-thd", "dominant-harmonic", "nonlinear-share", "detuned-bank"
   ].forEach((id) => {
     const input = document.getElementById(id);
     input.addEventListener("input", () => {
+      if (id === "voltage-preset" && input.value) {
+        document.getElementById("voltage").value = input.value;
+      }
       readGlobalInputs();
       calculateAndRender();
     });
@@ -99,8 +108,10 @@ function bindStaticEvents() {
 
 function renderInputs() {
   renderSystemButtons();
+  setValue("voltage-preset", state.voltagePreset);
   setValue("voltage", state.voltageKv);
   setValue("frequency", state.frequencyHz);
+  setValue("study-basis", state.studyBasis);
   setValue("target-pf", state.targetPf);
   setValue("capacitor-cost", state.capacitorCost);
   setValue("energy-rate", state.energyRate);
@@ -130,11 +141,15 @@ function renderLoads() {
     node.querySelector(".load-name").value = load.name;
     node.querySelector(".load-type").value = load.type;
     node.querySelector(".input-mode").value = load.mode;
+    node.querySelector(".load-hp").value = load.hp;
     node.querySelector(".load-p").value = load.pKw;
     node.querySelector(".load-pf").value = load.pf;
     node.querySelector(".load-s").value = load.sKva;
     node.querySelector(".load-q").value = load.qKvar;
     node.querySelector(".load-i").value = load.currentA;
+    node.querySelector(".load-voltage").value = load.voltageKv;
+    node.querySelector(".load-efficiency").value = load.efficiencyPct;
+    node.querySelector(".load-demand").value = load.demandPct;
     node.querySelector(".remove-load").addEventListener("click", () => {
       state.loads = state.loads.filter((item) => item.id !== load.id);
       renderLoads();
@@ -151,8 +166,10 @@ function renderLoads() {
 }
 
 function readGlobalInputs() {
-  state.voltageKv = readNumber("voltage", 0.23);
+  state.voltagePreset = document.getElementById("voltage-preset").value;
+  state.voltageKv = readNumber("voltage", state.voltagePreset ? Number(state.voltagePreset) : 0.23);
   state.frequencyHz = readNumber("frequency", 50);
+  state.studyBasis = document.getElementById("study-basis").value;
   state.targetPf = readNumber("target-pf", 0.95);
   state.capacitorCost = readNumber("capacitor-cost", 18);
   state.energyRate = readNumber("energy-rate", 0.12);
@@ -174,11 +191,15 @@ function readLoadNode(node, index) {
     name: node.querySelector(".load-name").value || `Load ${index + 1}`,
     type: node.querySelector(".load-type").value,
     mode: node.querySelector(".input-mode").value,
+    hp: readNodeNumber(node, ".load-hp", 0),
     pKw: readNodeNumber(node, ".load-p", 0),
-    pf: readNodeNumber(node, ".load-pf", 0.9),
+    pf: readNodeNumber(node, ".load-pf", 0),
     sKva: readNodeNumber(node, ".load-s", 0),
     qKvar: readNodeNumber(node, ".load-q", 0),
-    currentA: readNodeNumber(node, ".load-i", 0)
+    currentA: readNodeNumber(node, ".load-i", 0),
+    voltageKv: readNodeNumber(node, ".load-voltage", 0),
+    efficiencyPct: readNodeNumber(node, ".load-efficiency", 0),
+    demandPct: readNodeNumber(node, ".load-demand", 100)
   };
 }
 
@@ -248,6 +269,7 @@ function showTab(tab) {
   document.querySelectorAll("[data-tab]").forEach((button) => button.classList.toggle("active", button.dataset.tab === tab));
   document.querySelectorAll(".tab-panel").forEach((panel) => panel.classList.remove("active"));
   document.getElementById(`${tab}-panel`).classList.add("active");
+  if (latestAnalysis) renderCharts(latestAnalysis);
 }
 
 function showInputTab(tab) {
