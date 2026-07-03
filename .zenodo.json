@@ -1,6 +1,8 @@
 {
   "title": "OFORI Power Tool: Power Factor Correction and Harmonics Analysis",
   "upload_type": "software",
+  "version": "1.1.0",
+  "publication_date": "2026-07-03",
   "description": "A web-based tool for load analysis, power factor correction, capacitor sizing, energy cost estimation, and harmonics screening for industrial and utility facilities.",
   "creators": [
     {
