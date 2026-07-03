@@ -79,6 +79,13 @@
               <option value="utility">Utility bill review</option>
             </select>
           </label>
+          <label>Standards Basis
+            <select id="standards-basis">
+              <option value="hybrid">IEC + NEC screening</option>
+              <option value="iec">IEC / international</option>
+              <option value="nec">NEC / NFPA 70</option>
+            </select>
+          </label>
         </div>
       </section>
 
@@ -130,6 +137,7 @@
         <button data-tab="loads" role="tab">Loads</button>
         <button data-tab="correction" role="tab">Correction</button>
         <button data-tab="harmonics" role="tab">Harmonics</button>
+        <button data-tab="standards" role="tab">Standards</button>
         <button data-tab="report" role="tab">Report</button>
       </div>
 
@@ -151,7 +159,7 @@
       <section class="tab-panel" id="loads-panel">
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Load</th><th>Type</th><th>P kW</th><th>Q kVAr</th><th>S kVA</th><th>PF</th><th>Current A</th></tr></thead>
+            <thead><tr><th>Load</th><th>Type</th><th>Method</th><th>Voltage kV</th><th>P kW</th><th>Q kVAr</th><th>S kVA</th><th>PF</th><th>Current A</th></tr></thead>
             <tbody id="load-results"></tbody>
           </table>
         </div>
@@ -194,6 +202,39 @@
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section class="tab-panel" id="standards-panel">
+        <div class="metric-grid">
+          <article><span>Screening Status</span><strong id="standards-status">Review</strong><small>Code and power-quality basis</small></article>
+          <article><span>Voltage Class</span><strong id="voltage-class">LV</strong><small id="voltage-standard-status">Voltage standard review</small></article>
+          <article><span>Harmonic Screen</span><strong id="harmonic-standard-status">Review</strong><small id="harmonic-standard-note">Power-quality limits</small></article>
+        </div>
+        <div class="standards-grid">
+          <section>
+            <h2>Installation Review</h2>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead><tr><th>Area</th><th>Status</th><th>Review Note</th></tr></thead>
+                <tbody id="installation-checks"></tbody>
+              </table>
+            </div>
+          </section>
+          <section>
+            <h2>Equipment Review</h2>
+            <div class="table-wrap compact-table">
+              <table>
+                <thead><tr><th>Equipment</th><th>Status</th><th>Review Note</th></tr></thead>
+                <tbody id="equipment-checks"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <div class="reference-list">
+          <h2>Reference Basis</h2>
+          <ul id="standards-references"></ul>
+        </div>
+        <p class="note">This is a screening aid. Final compliance depends on the adopted code edition, local authority having jurisdiction, utility requirements, manufacturer instructions, field measurements, short-circuit study, coordination study, and arc-flash review.</p>
       </section>
 
       <section class="tab-panel" id="report-panel">

@@ -13,33 +13,48 @@ export function round(value, digits = 2) {
 }
 
 export function calculateLoad(load, system) {
-  const mode = load.mode || "p-pf";
-  const voltageV = Math.max(Number(system.voltageKv) * 1000, 1);
+  const mode = load.mode || "kw-pf";
+  const loadVoltageKv = Number(load.voltageKv) > 0 ? Number(load.voltageKv) : Number(system.voltageKv);
+  const voltageV = Math.max(loadVoltageKv * 1000, 1);
   const multiplier = system.type === "three" ? Math.sqrt(3) : 1;
+  const demandFactor = percentOrDefault(load.demandPct, 100);
+  const efficiency = percentOrDefault(load.efficiencyPct, defaultEfficiency(load.type));
+  const hp = Math.max(Number(load.hp) || 0, 0);
   let p = Math.max(Number(load.pKw) || 0, 0);
   let q = Math.max(Number(load.qKvar) || 0, 0);
   let s = Math.max(Number(load.sKva) || 0, 0);
   let current = Math.max(Number(load.currentA) || 0, 0);
-  let pf = clamp(load.pf || 0.9, 0.01, 1);
+  let pf = clamp(load.pf || defaultPowerFactor(load.type, mode), 0.01, 1);
 
-  if (mode === "p-pf") {
+  if (mode === "motor-hp") {
+    p = hp > 0 ? (hp * 0.746 / efficiency) * demandFactor : p * demandFactor;
     s = p / pf;
     q = Math.sqrt(Math.max(s * s - p * p, 0));
   }
 
-  if (mode === "s-pf") {
+  if (mode === "kw-pf") {
+    p *= demandFactor;
+    s = p / pf;
+    q = Math.sqrt(Math.max(s * s - p * p, 0));
+  }
+
+  if (mode === "kva-pf") {
+    s *= demandFactor;
     p = s * pf;
     q = Math.sqrt(Math.max(s * s - p * p, 0));
   }
 
-  if (mode === "p-q") {
+  if (mode === "kw-kvar") {
+    p *= demandFactor;
+    q *= demandFactor;
     s = Math.sqrt(p * p + q * q);
     pf = s > 0 ? p / s : 1;
   }
 
-  if (mode === "p-i") {
+  if (mode === "current-pf") {
+    current *= demandFactor;
     s = (multiplier * voltageV * current) / 1000;
-    pf = s > 0 ? clamp(p / s, 0.01, 1) : 1;
+    p = s * pf;
     q = Math.sqrt(Math.max(s * s - p * p, 0));
   }
 
@@ -50,13 +65,44 @@ export function calculateLoad(load, system) {
     id: load.id,
     name: load.name || "Load",
     type: load.type || "Other",
+    mode,
     pKw: p,
     qKvar: q,
     sKva: s,
     pf,
     currentA: current,
-    phiDeg
+    phiDeg,
+    voltageKv: loadVoltageKv,
+    demandFactor,
+    efficiency
   };
+}
+
+function percentOrDefault(value, fallbackPercent) {
+  const number = Number(value);
+  const percent = Number.isFinite(number) && number > 0 ? number : fallbackPercent;
+  return clamp(percent / 100, 0, 1);
+}
+
+function defaultPowerFactor(type = "", mode = "") {
+  if (mode === "kw-kvar") return 1;
+  const normalized = type.toLowerCase();
+  if (normalized.includes("heater")) return 1;
+  if (normalized.includes("welder")) return 0.75;
+  if (normalized.includes("motor") || normalized.includes("pump") || normalized.includes("fan") || normalized.includes("compressor")) return 0.85;
+  if (normalized.includes("vfd") || normalized.includes("drive")) return 0.95;
+  if (normalized.includes("transformer")) return 0.98;
+  if (normalized.includes("lighting")) return 0.95;
+  return 0.9;
+}
+
+function defaultEfficiency(type = "") {
+  const normalized = type.toLowerCase();
+  if (normalized.includes("motor") || normalized.includes("pump") || normalized.includes("fan") || normalized.includes("compressor")) return 90;
+  if (normalized.includes("vfd") || normalized.includes("drive")) return 96;
+  if (normalized.includes("transformer")) return 98;
+  if (normalized.includes("heater")) return 100;
+  return 90;
 }
 
 export function calculateHarmonics(inputs, totals) {

@@ -1,4 +1,5 @@
 import { calculateAnalysis } from "./power-model.js";
+import { screenStandards } from "./standards-model.js";
 import { saveState, exportState } from "./storage.js";
 import { renderCharts } from "./charts.js";
 import { buildReportState, createExecutiveSummary, formatCurrency, formatNumber } from "./reporting.js";
@@ -9,6 +10,7 @@ const defaultState = {
   voltageKv: "",
   frequencyHz: "",
   studyBasis: "nameplate",
+  standardsBasis: "hybrid",
   targetPf: "",
   capacitorCost: "",
   energyRate: "",
@@ -91,7 +93,7 @@ function bindStaticEvents() {
   });
 
   [
-    "voltage-preset", "voltage", "frequency", "study-basis", "target-pf", "capacitor-cost", "energy-rate",
+    "voltage-preset", "voltage", "frequency", "study-basis", "standards-basis", "target-pf", "capacitor-cost", "energy-rate",
     "reactive-rate", "hours-day", "days-month", "voltage-thd",
     "current-thd", "dominant-harmonic", "nonlinear-share", "detuned-bank"
   ].forEach((id) => {
@@ -112,6 +114,7 @@ function renderInputs() {
   setValue("voltage", state.voltageKv);
   setValue("frequency", state.frequencyHz);
   setValue("study-basis", state.studyBasis);
+  setValue("standards-basis", state.standardsBasis);
   setValue("target-pf", state.targetPf);
   setValue("capacitor-cost", state.capacitorCost);
   setValue("energy-rate", state.energyRate);
@@ -170,6 +173,7 @@ function readGlobalInputs() {
   state.voltageKv = readNumber("voltage", state.voltagePreset ? Number(state.voltagePreset) : 0.23);
   state.frequencyHz = readNumber("frequency", 50);
   state.studyBasis = document.getElementById("study-basis").value;
+  state.standardsBasis = document.getElementById("standards-basis").value;
   state.targetPf = readNumber("target-pf", 0.95);
   state.capacitorCost = readNumber("capacitor-cost", 18);
   state.energyRate = readNumber("energy-rate", 0.12);
@@ -208,7 +212,7 @@ function calculateAndRender() {
     readGlobalInputs();
     document.querySelectorAll(".load-card").forEach((node, index) => readLoadNode(node, index));
     latestAnalysis = calculateAnalysis(state);
-    renderResults(latestAnalysis);
+    renderResults(latestAnalysis, screenStandards(state, latestAnalysis));
     saveState(state);
     dom.error.textContent = "";
   } catch (error) {
@@ -216,7 +220,7 @@ function calculateAndRender() {
   }
 }
 
-function renderResults(analysis) {
+function renderResults(analysis, standards) {
   setText("total-p", `${formatNumber(analysis.totals.pKw)} kW`);
   setText("total-q", `${formatNumber(analysis.totals.qKvar)} kVAr`);
   setText("total-s", `${formatNumber(analysis.totals.sKva)} kVA`);
@@ -243,8 +247,41 @@ function renderResults(analysis) {
   applyRiskClass("harmonic-risk", analysis.harmonics.risk.className);
 
   renderLoadResults(analysis.loads);
+  renderStandards(standards);
   document.getElementById("executive-summary").innerHTML = createExecutiveSummary(analysis);
   renderCharts(analysis);
+}
+
+function renderStandards(standards) {
+  setText("standards-status", standards.summaryLevel);
+  setText("voltage-class", standards.voltageClass);
+  setText("voltage-standard-status", standards.voltageStatus.text);
+  setText("harmonic-standard-status", standards.harmonicStatus.level);
+  setText("harmonic-standard-note", standards.harmonicStatus.text);
+  renderCheckRows("installation-checks", standards.installationChecks, "area");
+  renderCheckRows("equipment-checks", standards.equipmentChecks, "area");
+
+  const refs = document.getElementById("standards-references");
+  refs.innerHTML = "";
+  standards.references.forEach((reference) => {
+    const item = document.createElement("li");
+    item.textContent = reference;
+    refs.appendChild(item);
+  });
+}
+
+function renderCheckRows(id, checks, areaKey) {
+  const body = document.getElementById(id);
+  body.innerHTML = "";
+  checks.forEach((check) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${escapeHtml(check[areaKey])}</td>
+      <td><span class="status-pill ${statusClass(check.level)}">${escapeHtml(check.level)}</span></td>
+      <td>${escapeHtml(check.text)}</td>
+    `;
+    body.appendChild(row);
+  });
 }
 
 function renderLoadResults(loads) {
@@ -255,6 +292,8 @@ function renderLoadResults(loads) {
     row.innerHTML = `
       <td>${escapeHtml(load.name)}</td>
       <td>${escapeHtml(load.type)}</td>
+      <td>${escapeHtml(formatMode(load.mode))}</td>
+      <td>${formatNumber(load.voltageKv, 3)}</td>
       <td>${formatNumber(load.pKw)}</td>
       <td>${formatNumber(load.qKvar)}</td>
       <td>${formatNumber(load.sKva)}</td>
@@ -263,6 +302,17 @@ function renderLoadResults(loads) {
     `;
     body.appendChild(row);
   });
+}
+
+function formatMode(mode) {
+  const labels = {
+    "motor-hp": "Motor HP + Eff + PF",
+    "kw-pf": "kW + PF",
+    "kva-pf": "kVA + PF",
+    "kw-kvar": "kW + kVAr",
+    "current-pf": "Current + Voltage + PF"
+  };
+  return labels[mode] || mode || "Nameplate";
 }
 
 function showTab(tab) {
@@ -315,6 +365,12 @@ function applyRiskClass(id, className) {
   const element = document.getElementById(id);
   element.classList.remove("status-low", "status-watch", "status-high");
   element.classList.add(className);
+}
+
+function statusClass(level) {
+  if (level === "Action") return "status-action";
+  if (level === "OK") return "status-ok";
+  return "status-review";
 }
 
 function escapeHtml(value) {
