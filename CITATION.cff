@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+title: "OFORI Power Tool: Power Factor Correction and Harmonics Analysis"
+message: "If you use this software, please cite it using the metadata in this file."
+type: software
+authors:
+  - family-names: "Ofori Manu"
+    given-names: "Solomon"
+    orcid: "https://orcid.org/0009-0003-8474-8509"
+repository-code: "https://github.com/yawmanu17/power-tool"
+url: "https://yawmanu17.github.io/power-tool/"
+abstract: "A web-based decision-support tool for power factor correction, load analysis, energy cost estimation, and harmonics screening."
+keywords:
+  - power factor correction
+  - harmonics
+  - power quality
+  - capacitor bank sizing
+  - load analysis
+  - water and wastewater utilities
+license: MIT
+version: "1.0.0"
+date-released: "2026-07-03"

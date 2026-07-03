@@ -1,0 +1,22 @@
+{
+  "title": "OFORI Power Tool: Power Factor Correction and Harmonics Analysis",
+  "upload_type": "software",
+  "description": "A web-based tool for load analysis, power factor correction, capacitor sizing, energy cost estimation, and harmonics screening for industrial and utility facilities.",
+  "creators": [
+    {
+      "name": "Ofori Manu, Solomon",
+      "orcid": "0009-0003-8474-8509"
+    }
+  ],
+  "keywords": [
+    "power factor correction",
+    "harmonics",
+    "power quality",
+    "capacitor bank sizing",
+    "load analysis",
+    "energy efficiency",
+    "water and wastewater utilities"
+  ],
+  "license": "MIT",
+  "access_right": "open"
+}
