@@ -14,7 +14,7 @@ export function round(value, digits = 2) {
 
 export function calculateLoad(load, system) {
   const mode = load.mode || "kw-pf";
-  const loadVoltageKv = Number(load.voltageKv) > 0 ? Number(load.voltageKv) : Number(system.voltageKv);
+  const loadVoltageKv = Number(system.voltageKv);
   const voltageV = Math.max(loadVoltageKv * 1000, 1);
   const multiplier = system.type === "three" ? Math.sqrt(3) : 1;
   const demandFactor = percentOrDefault(load.demandPct, 100);

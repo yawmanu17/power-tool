@@ -209,6 +209,36 @@ h2 {
   color: var(--accent-strong);
 }
 
+.phase-context {
+  display: grid;
+  gap: 4px;
+  margin: -2px 0 14px;
+  padding: 10px 12px;
+  border: 1px solid #ead0cc;
+  border-radius: 8px;
+  background: #fff8f7;
+}
+
+.phase-context strong {
+  color: var(--accent-strong);
+  font-size: 0.9rem;
+}
+
+.phase-context span,
+.input-note {
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.input-note {
+  margin: 12px 0 0;
+}
+
+.method-note {
+  margin-top: 10px;
+}
+
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

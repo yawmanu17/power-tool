@@ -38,33 +38,37 @@
           <button type="button" class="active" data-system="single">Single Phase</button>
           <button type="button" data-system="three">Three Phase</button>
         </div>
+        <div class="phase-context" id="phase-context">
+          <strong id="phase-title">Single Phase Load Supply</strong>
+          <span id="phase-note">Use line-to-neutral or split-phase RMS voltage for single-phase equipment.</span>
+        </div>
         <div class="field-grid">
-          <label>Voltage Class
+          <label>Load Supply Voltage
             <select id="voltage-preset">
               <option value="">Select voltage</option>
               <optgroup label="LV single phase">
-                <option value="0.12">120 V</option>
-                <option value="0.23">230 V</option>
-                <option value="0.24">240 V</option>
+                <option value="0.12" data-phase="single">120 V</option>
+                <option value="0.23" data-phase="single">230 V</option>
+                <option value="0.24" data-phase="single">240 V</option>
               </optgroup>
               <optgroup label="LV three phase">
-                <option value="0.208">208 V</option>
-                <option value="0.4">400 V</option>
-                <option value="0.415">415 V</option>
-                <option value="0.48">480 V</option>
-                <option value="0.6">600 V</option>
+                <option value="0.208" data-phase="three">208 V L-L</option>
+                <option value="0.4" data-phase="three">400 V L-L</option>
+                <option value="0.415" data-phase="three">415 V L-L</option>
+                <option value="0.48" data-phase="three">480 V L-L</option>
+                <option value="0.6" data-phase="three">600 V L-L</option>
               </optgroup>
               <optgroup label="MV">
-                <option value="3.3">3.3 kV</option>
-                <option value="4.16">4.16 kV</option>
-                <option value="6.6">6.6 kV</option>
-                <option value="11">11 kV</option>
-                <option value="13.8">13.8 kV</option>
-                <option value="33">33 kV</option>
+                <option value="3.3" data-phase="three">3.3 kV L-L</option>
+                <option value="4.16" data-phase="three">4.16 kV L-L</option>
+                <option value="6.6" data-phase="three">6.6 kV L-L</option>
+                <option value="11" data-phase="three">11 kV L-L</option>
+                <option value="13.8" data-phase="three">13.8 kV L-L</option>
+                <option value="33" data-phase="three">33 kV L-L</option>
               </optgroup>
             </select>
           </label>
-          <label>Custom Voltage <span>kV RMS</span><input id="voltage" type="number" min="0.01" step="0.001"></label>
+          <label>Custom Load Voltage <span id="voltage-help">kV RMS L-N / L-L as selected</span><input id="voltage" type="number" min="0.01" step="0.001"></label>
           <label>Frequency
             <select id="frequency">
               <option value="">Select frequency</option>
@@ -72,11 +76,12 @@
               <option value="60">60 Hz</option>
             </select>
           </label>
-          <label>Study Basis
+          <label>Study Purpose
             <select id="study-basis">
-              <option value="nameplate">Nameplate screening</option>
-              <option value="measured">Measured field data</option>
-              <option value="utility">Utility bill review</option>
+              <option value="nameplate">Equipment nameplate estimate</option>
+              <option value="measured">Measured field readings</option>
+              <option value="power-quality">Power-quality survey</option>
+              <option value="utility">Utility bill / capacitor review</option>
             </select>
           </label>
           <label>Standards Basis
@@ -87,6 +92,7 @@
             </select>
           </label>
         </div>
+        <p class="input-note">The selected system voltage is used for all load current calculations. Choose the phase arrangement first so the voltage list matches the equipment supply.</p>
       </section>
 
       <section class="input-section" id="loads-input">
@@ -265,25 +271,25 @@
             <option>Other</option>
           </select>
         </label>
-        <label>Nameplate Method
+        <label>Available Nameplate Data
           <select class="input-mode">
             <option value="motor-hp">Motor HP + Eff + PF</option>
             <option value="kw-pf">kW + PF</option>
             <option value="kva-pf">kVA + PF</option>
             <option value="kw-kvar">kW + kVAr</option>
-            <option value="current-pf">Current + Voltage + PF</option>
+            <option value="current-pf">Current + PF</option>
           </select>
         </label>
-        <label>Motor Rating <span>HP</span><input class="load-hp" type="number" min="0" step="0.01"></label>
-        <label>Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01"></label>
-        <label>Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01"></label>
-        <label>Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01"></label>
-        <label>Current <span>A</span><input class="load-i" type="number" min="0" step="0.01"></label>
-        <label>Equipment Voltage <span>kV optional</span><input class="load-voltage" type="number" min="0" step="0.001"></label>
-        <label>Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01"></label>
-        <label>Efficiency <span>%</span><input class="load-efficiency" type="number" min="1" max="100" step="0.1"></label>
-        <label>Demand Factor <span>%</span><input class="load-demand" type="number" min="0" max="100" step="1"></label>
+        <label data-method-field="motor-hp">Motor Rating <span>HP</span><input class="load-hp" type="number" min="0" step="0.01"></label>
+        <label data-method-field="kw-pf kw-kvar">Real Power <span>kW</span><input class="load-p" type="number" min="0" step="0.01"></label>
+        <label data-method-field="kva-pf">Apparent Power <span>kVA</span><input class="load-s" type="number" min="0" step="0.01"></label>
+        <label data-method-field="kw-kvar">Reactive Power <span>kVAr</span><input class="load-q" type="number" min="0" step="0.01"></label>
+        <label data-method-field="current-pf">Measured Current <span>A</span><input class="load-i" type="number" min="0" step="0.01"></label>
+        <label data-method-field="motor-hp kw-pf kva-pf current-pf">Power Factor<input class="load-pf" type="number" min="0.01" max="1" step="0.01"></label>
+        <label data-method-field="motor-hp">Efficiency <span>%</span><input class="load-efficiency" type="number" min="1" max="100" step="0.1"></label>
+        <label data-method-field="motor-hp kw-pf kva-pf kw-kvar current-pf">Demand Factor <span>%</span><input class="load-demand" type="number" min="0" max="100" step="1"></label>
       </div>
+      <p class="input-note method-note">Use the system load voltage selected in the System tab. Select the method that matches the data actually available on the nameplate or field meter.</p>
     </article>
   </template>
 

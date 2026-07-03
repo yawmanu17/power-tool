@@ -39,7 +39,6 @@ function createBlankLoad(name = "Load") {
     sKva: "",
     qKvar: "",
     currentA: "",
-    voltageKv: "",
     efficiencyPct: "",
     demandPct: ""
   };
@@ -48,7 +47,12 @@ function createBlankLoad(name = "Load") {
 const dom = {
   loadList: document.getElementById("load-list"),
   template: document.getElementById("load-template"),
-  error: document.getElementById("error-message")
+  error: document.getElementById("error-message"),
+  phaseTitle: document.getElementById("phase-title"),
+  phaseNote: document.getElementById("phase-note"),
+  voltageHelp: document.getElementById("voltage-help"),
+  voltagePreset: document.getElementById("voltage-preset"),
+  voltage: document.getElementById("voltage")
 };
 
 let state = normalizeState(defaultState);
@@ -67,6 +71,7 @@ function bindStaticEvents() {
     button.addEventListener("click", () => {
       state.systemType = button.dataset.system;
       renderSystemButtons();
+      readGlobalInputs();
       calculateAndRender();
     });
   });
@@ -109,7 +114,6 @@ function bindStaticEvents() {
 }
 
 function renderInputs() {
-  renderSystemButtons();
   setValue("voltage-preset", state.voltagePreset);
   setValue("voltage", state.voltageKv);
   setValue("frequency", state.frequencyHz);
@@ -126,6 +130,7 @@ function renderInputs() {
   setValue("dominant-harmonic", state.harmonics.dominantHarmonic);
   setValue("nonlinear-share", state.harmonics.nonlinearShare);
   document.getElementById("detuned-bank").checked = Boolean(state.harmonics.detunedBank);
+  renderSystemButtons();
   renderLoads();
 }
 
@@ -133,6 +138,28 @@ function renderSystemButtons() {
   document.querySelectorAll("[data-system]").forEach((button) => {
     button.classList.toggle("active", button.dataset.system === state.systemType);
   });
+  renderPhaseContext();
+}
+
+function renderPhaseContext() {
+  const isThreePhase = state.systemType === "three";
+  dom.phaseTitle.textContent = isThreePhase ? "Three Phase Load Supply" : "Single Phase Load Supply";
+  dom.phaseNote.textContent = isThreePhase
+    ? "Use line-to-line RMS voltage for three-phase equipment and feeder current calculations."
+    : "Use line-to-neutral or split-phase RMS voltage for single-phase equipment.";
+  dom.voltageHelp.textContent = isThreePhase ? "kV RMS L-L" : "kV RMS L-N / single-phase supply";
+
+  dom.voltagePreset.querySelectorAll("option[data-phase]").forEach((option) => {
+    option.disabled = option.dataset.phase !== state.systemType;
+  });
+
+  const selected = dom.voltagePreset.selectedOptions[0];
+  if (selected?.dataset.phase && selected.dataset.phase !== state.systemType) {
+    dom.voltagePreset.value = "";
+    dom.voltage.value = "";
+    state.voltagePreset = "";
+    state.voltageKv = "";
+  }
 }
 
 function renderLoads() {
@@ -150,9 +177,9 @@ function renderLoads() {
     node.querySelector(".load-s").value = load.sKva;
     node.querySelector(".load-q").value = load.qKvar;
     node.querySelector(".load-i").value = load.currentA;
-    node.querySelector(".load-voltage").value = load.voltageKv;
     node.querySelector(".load-efficiency").value = load.efficiencyPct;
     node.querySelector(".load-demand").value = load.demandPct;
+    updateLoadMethodFields(node);
     node.querySelector(".remove-load").addEventListener("click", () => {
       state.loads = state.loads.filter((item) => item.id !== load.id);
       renderLoads();
@@ -160,11 +187,22 @@ function renderLoads() {
     });
     node.querySelectorAll("input, select").forEach((input) => {
       input.addEventListener("input", () => {
+        if (input.classList.contains("input-mode")) {
+          updateLoadMethodFields(node);
+        }
         readLoadNode(node, index);
         calculateAndRender();
       });
     });
     dom.loadList.appendChild(node);
+  });
+}
+
+function updateLoadMethodFields(node) {
+  const mode = node.querySelector(".input-mode").value;
+  node.querySelectorAll("[data-method-field]").forEach((field) => {
+    const methods = field.dataset.methodField.split(/\s+/);
+    field.classList.toggle("hidden", !methods.includes(mode));
   });
 }
 
@@ -201,7 +239,6 @@ function readLoadNode(node, index) {
     sKva: readNodeNumber(node, ".load-s", 0),
     qKvar: readNodeNumber(node, ".load-q", 0),
     currentA: readNodeNumber(node, ".load-i", 0),
-    voltageKv: readNodeNumber(node, ".load-voltage", 0),
     efficiencyPct: readNodeNumber(node, ".load-efficiency", 0),
     demandPct: readNodeNumber(node, ".load-demand", 100)
   };
@@ -310,7 +347,7 @@ function formatMode(mode) {
     "kw-pf": "kW + PF",
     "kva-pf": "kVA + PF",
     "kw-kvar": "kW + kVAr",
-    "current-pf": "Current + Voltage + PF"
+    "current-pf": "Current + PF"
   };
   return labels[mode] || mode || "Nameplate";
 }
