@@ -22,7 +22,7 @@ OFORI Power Tool v1.1.0: Harmonics Screening and Modular Release
 
 ## Suggested DOI Title
 
-OFORI Power Tool: Power Factor Correction and Harmonics Analysis
+OFORI Power Tool: Power Factor Correction, Harmonics, and Standards-Aware Load Review
 
 ## Limitations
 

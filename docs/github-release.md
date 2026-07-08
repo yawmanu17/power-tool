@@ -17,7 +17,12 @@ This release upgrades OFORI Power Tool into a modular static web application for
 - Modular files under `assets/css` and `assets/js`.
 - Printable report view that reads the saved calculator state.
 - Release and publication documentation for GitHub, Zenodo, OSF, Figshare, and scholarly use.
+- Software paper package documenting the original program, current app, equations, standards-aware review, validation examples, limitations, and platform submission text.
 
 ### Notes
 
 The tool is intended for screening and communication. Final equipment sizing should be verified with site measurements and current utility or power-quality requirements.
+
+For manuscript release, include `docs/paper-manuscript.md`, `docs/paper-publication-packet.md`, `docs/paper-platform-submissions.md`, and `docs/paper-release-notes.md`.
+
+For the companion generator reactive capability paper, include `docs/generator-reactive-capability-manuscript.md`, `docs/generator-reactive-capability-publication-packet.md`, `docs/generator-reactive-capability-platform-submissions.md`, and `docs/generator-reactive-capability-release-notes.md`.

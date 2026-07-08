@@ -2,15 +2,15 @@
 
 ## Title
 
-OFORI Power Tool: A Browser-Based Calculator for Power Factor Correction, Load Analysis, Cost Estimation, and Harmonics Screening
+OFORI Power Tool: A Browser-Based Engineering Screening Application for Power Factor Correction, Harmonics, and Standards-Aware Load Review
 
 ## Abstract
 
-OFORI Power Tool is a lightweight web application for preliminary electrical load analysis, power factor correction, energy cost estimation, and harmonics screening. The tool accepts common field inputs such as kW, kVA, power factor, current, voltage, operating schedule, and utility rates. It calculates real power, reactive power, apparent power, displacement power factor, estimated line current, capacitor compensation requirements, monthly cost impacts, and simple payback. The enhanced version adds harmonic screening inputs for voltage total harmonic distortion, current total harmonic distortion, dominant harmonic order, nonlinear load share, and detuned capacitor bank planning. Results distinguish displacement power factor from true power factor, supporting better communication between utility billing analysis, capacitor sizing, and power-quality mitigation.
+OFORI Power Tool is a browser-based engineering screening application for preliminary electrical load analysis, power factor correction, energy cost estimation, harmonics screening, and standards-aware review. The current app supports single-phase and three-phase studies, LV/MV voltage selection, 50/60 Hz operation, motor horsepower input, kW + PF, kVA + PF, kW + kVAr, current + PF, demand factor, efficiency, utility rates, voltage THD, current THD, dominant harmonic order, nonlinear load share, detuned capacitor bank indication, charts, JSON export, and printable report output. It calculates real power, reactive power, apparent power, displacement power factor, true power factor, estimated line current, capacitor compensation, corrected apparent power, capacitance, monthly cost impact, harmonic apparent power, transformer K-factor exposure, and review prompts. Results distinguish displacement power factor from true power factor and separate capacitor correction from harmonic mitigation.
 
 ## Keywords
 
-power factor correction; harmonics; power quality; capacitor bank sizing; energy cost; load analysis; web-based engineering tool
+power factor correction; harmonics; power quality; capacitor bank sizing; energy cost; load analysis; IEEE 519; IEC 61000; NEC; web-based engineering tool
 
 ## Software Availability Statement
 
@@ -18,8 +18,24 @@ The software is available as a static browser application and may be hosted on G
 
 ## Methods Summary
 
-The application computes fundamental power quantities from user-selected load input modes. Total real and reactive power are summed across loads, and total apparent power is calculated from the power triangle. Capacitor compensation is sized from the difference between present reactive power and the target reactive power corresponding to the selected displacement power factor. Harmonics screening applies current THD to estimate distortion factor, true power factor, harmonic apparent power, and transformer K-factor exposure. The harmonic assessment is a screening method and should be verified with field measurements for final design.
+The application computes fundamental power quantities from user-selected load input modes including motor HP, kW + PF, kVA + PF, kW + kVAr, and current + PF. The upgraded manuscript in `docs/paper-manuscript.md` now gives IEEE-style numbered formulas for demand factor, efficiency, load conversion, total power triangle values, line current, target PF correction, capacitance, economics, distortion factor, true PF, harmonic apparent power, harmonic current, and K-factor screening. Standards-aware screening classifies voltage, checks 50/60 Hz basis, flags nonlinear and capacitor-bank review needs, and directs the user toward IEC, NEC/NFPA 70, IEEE, utility, and manufacturer requirements. The harmonic and standards assessments are screening methods and should be verified with field measurements for final design.
+
+## Full Paper Package
+
+- `docs/paper-manuscript.md`
+- `docs/paper-publication-packet.md`
+- `docs/paper-platform-submissions.md`
+- `docs/paper-release-notes.md`
+
+## Companion Power-Systems Paper
+
+The repository also includes a refined companion manuscript on generator reactive capability screening:
+
+- `docs/generator-reactive-capability-manuscript.md`
+- `docs/generator-reactive-capability-publication-packet.md`
+- `docs/generator-reactive-capability-platform-submissions.md`
+- `docs/generator-reactive-capability-release-notes.md`
 
 ## Recommended Citation
 
-Ofori Manu, S. (2026). OFORI Power Tool: Power Factor Correction and Harmonics Analysis (Version 1.1.0) [Software]. GitHub.
+Ofori Manu, S. (2026). OFORI Power Tool: Power Factor Correction, Harmonics, and Standards-Aware Load Review (Version 1.1.0) [Software]. GitHub.

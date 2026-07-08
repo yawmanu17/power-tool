@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generator reactive capability screening tool for GSU tap settings, station-service load, and net VAR delivery.">
+  <title>OFORI Generator VAR Tool</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">OFORI Electricals</p>
+      <h1>Generator Reactive Capability Tool</h1>
+      <p class="lede">A screening worksheet for GSU tap position, station-service load, generator voltage limits, and net reactive power delivered to the transmission system.</p>
+    </div>
+    <nav class="header-actions" aria-label="Primary actions">
+      <button class="icon-button" id="load-example" type="button">Load Example</button>
+      <button class="icon-button" id="print-report" type="button">Print</button>
+      <button class="icon-button" id="export-json" type="button">Export JSON</button>
+      <a class="button-link" href="index.html">Power Tool</a>
+    </nav>
+  </header>
+
+  <main class="app-shell">
+    <aside class="input-panel" aria-label="Generator capability inputs">
+      <section class="input-section active">
+        <h2>Generator</h2>
+        <div class="field-grid">
+          <label>Study Base <span>MVA</span><input id="base-mva" type="number" min="1" step="1"></label>
+          <label>Generator Rating <span>MVA</span><input id="generator-mva" type="number" min="0" step="0.1"></label>
+          <label>Rated PF<input id="rated-pf" type="number" min="0.01" max="1" step="0.01"></label>
+          <label>Rated MW<input id="mw-rated" type="number" min="0" step="0.1"></label>
+          <label>Q Max <span>Mvar</span><input id="q-max" type="number" step="0.1"></label>
+          <label>Q Min <span>Mvar</span><input id="q-min" type="number" step="0.1"></label>
+          <label>Rated Voltage <span>kV</span><input id="v-rated-kv" type="number" min="0" step="0.1"></label>
+          <label>High V Limit <span>pu</span><input id="v-hi" type="number" min="0" step="0.001"></label>
+          <label>Low V Limit <span>pu</span><input id="v-lo" type="number" min="0" step="0.001"></label>
+        </div>
+      </section>
+
+      <section class="input-section active">
+        <h2>System and GSU</h2>
+        <div class="field-grid">
+          <label>Connection Voltage
+            <select id="connection-kv">
+              <option value="">Select kV</option>
+              <option value="115">115 kV</option>
+              <option value="230">230 kV</option>
+              <option value="500">500 kV</option>
+            </select>
+          </label>
+          <label>Production Test V <span>pu optional</span><input id="test-voltage-production" type="number" min="0" step="0.001"></label>
+          <label>Absorption Test V <span>pu optional</span><input id="test-voltage-absorption" type="number" min="0" step="0.001"></label>
+          <label>Station Service P <span>MW low side</span><input id="pss-l" type="number" min="0" step="0.1"></label>
+          <label>Station Service Q <span>Mvar low side</span><input id="qss-l" type="number" min="0" step="0.1"></label>
+          <label>GSU Rating <span>MVA</span><input id="gsu-mva" type="number" min="0" step="0.1"></label>
+          <label>GSU R <span>% on base</span><input id="percent-r" type="number" min="0" step="0.001"></label>
+          <label>GSU X <span>% on base</span><input id="percent-x" type="number" min="0" step="0.001"></label>
+          <label>X / R <span>optional</span><input id="x-over-r" type="number" min="0" step="0.1"></label>
+        </div>
+        <label class="full-field">Tap Ratios <span>comma separated</span><input id="taps" type="text"></label>
+        <p class="input-note">Use per-unit voltage limits and tap ratios. The built-in voltage schedule uses 115, 230, and 500 kV study values from the original project; custom test voltages override the schedule.</p>
+        <button class="primary-action" type="button" onclick="document.getElementById('load-example').click()">Load Project Example</button>
+        <p class="error-message" id="error-message"></p>
+      </section>
+    </aside>
+
+    <section class="results-panel">
+      <div class="tab-panel active">
+        <div class="metric-grid">
+          <article>
+            <span>Best VAR Production</span>
+            <strong id="best-production">N/A</strong>
+            <small>Highest net Q delivered</small>
+          </article>
+          <article>
+            <span>Strongest VAR Absorption</span>
+            <strong id="best-absorption">N/A</strong>
+            <small>Most negative net Q delivered</small>
+          </article>
+          <article>
+            <span>Limited Cases</span>
+            <strong id="limited-cases">N/A</strong>
+            <small>Tap cases at capability limit</small>
+          </article>
+          <article>
+            <span>Review Status</span>
+            <strong id="review-status">N/A</strong>
+            <small>Screening result</small>
+          </article>
+        </div>
+
+        <p class="note" id="study-summary">Enter generator, GSU, station-service, voltage schedule, and tap data to run the screen.</p>
+
+        <div class="chart-frame wide-chart">
+          <canvas id="tap-chart" aria-label="Net Mvar delivered by tap"></canvas>
+        </div>
+
+        <h2>VAR Production</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tap</th>
+                <th>V1 pu</th>
+                <th>V2 eff pu</th>
+                <th>Qg Mvar</th>
+                <th>Q loss Mvar</th>
+                <th>Q2 Mvar</th>
+                <th>P2 MW</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="production-rows"></tbody>
+          </table>
+        </div>
+
+        <h2>VAR Absorption</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tap</th>
+                <th>V1 pu</th>
+                <th>V2 eff pu</th>
+                <th>Qg Mvar</th>
+                <th>Q loss Mvar</th>
+                <th>Q2 Mvar</th>
+                <th>P2 MW</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="absorption-rows"></tbody>
+          </table>
+        </div>
+
+        <p class="note">Screening only. Confirm tap convention, per-unit base, generator capability curve, AVR/excitation limits, planning-model assumptions, and NERC or utility requirements before design use.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <span>Built by Solomon Ofori Manu for OFORI Electricals.</span>
+    <span>Generator VAR screening only; verify with power-flow, stability, field, and planner studies.</span>
+  </footer>
+
+  <script type="module" src="assets/js/generator-app.js"></script>
+</body>
+</html>

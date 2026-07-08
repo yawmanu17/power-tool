@@ -2,11 +2,13 @@
 
 ## Project Title
 
-OFORI Power Tool: Power Factor Correction and Harmonics Analysis
+OFORI Power Tool: Power Factor Correction, Harmonics, and Standards-Aware Load Review
 
 ## Description
 
 This OSF project archives OFORI Power Tool, a browser-based calculator for electrical load analysis, power factor correction, energy cost estimation, and harmonics screening. The tool supports common field data inputs and separates fundamental power factor correction from harmonic distortion assessment.
+
+The project can also host the accompanying software paper package for publication review and reproducibility.
 
 ## Components
 
@@ -15,6 +17,9 @@ This OSF project archives OFORI Power Tool, a browser-based calculator for elect
 - Release notes.
 - Publication write-up.
 - Platform-specific metadata for software archiving.
+- Software paper manuscript.
+- Publication packet and platform submission text.
+- Companion generator reactive capability manuscript and release materials.
 
 ## Intended Use
 

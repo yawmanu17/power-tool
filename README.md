@@ -20,6 +20,7 @@ The tool is designed for early-stage electrical reviews in buildings, water and 
 ```text
 .
 |-- index.html
+|-- generator-reactive.html
 |-- powerbill.html
 |-- assets/
 |   |-- css/
@@ -27,13 +28,23 @@ The tool is designed for early-stage electrical reviews in buildings, water and 
 |   `-- js/
 |       |-- app.js
 |       |-- charts.js
+|       |-- generator-app.js
+|       |-- generator-model.js
 |       |-- power-model.js
 |       |-- reporting.js
 |       `-- storage.js
 |-- docs/
 |   |-- figshare.md
+|   |-- generator-reactive-capability-manuscript.md
+|   |-- generator-reactive-capability-platform-submissions.md
+|   |-- generator-reactive-capability-publication-packet.md
+|   |-- generator-reactive-capability-release-notes.md
 |   |-- github-release.md
 |   |-- osf.md
+|   |-- paper-manuscript.md
+|   |-- paper-platform-submissions.md
+|   |-- paper-publication-packet.md
+|   |-- paper-release-notes.md
 |   |-- publication.md
 |   `-- zenodo.md
 |-- CITATION.cff
@@ -46,6 +57,8 @@ The tool is designed for early-stage electrical reviews in buildings, water and 
 
 Open `index.html` in a browser or publish the repository with GitHub Pages. Enter system voltage, frequency, load details, economic rates, and harmonic screening values. Use the report tab or `powerbill.html` for a publication-ready summary.
 
+Open `generator-reactive.html` to run the companion generator reactive capability screen for GSU tap settings, station-service load, voltage schedule, and net VAR delivery.
+
 ## Engineering Notes
 
 Power factor correction is sized from fundamental reactive power and target displacement power factor. Harmonics are handled separately as a screening layer because standard capacitor banks can interact with harmonic currents and create resonance risk. For harmonic-rich systems, validate results with site measurements and current utility or power-quality standards before procurement.
@@ -54,7 +67,13 @@ Power factor correction is sized from fundamental reactive power and target disp
 
 Use the metadata in `CITATION.cff` when citing the software. A suggested short citation is:
 
-Ofori Manu, S. (2026). OFORI Power Tool: Power Factor Correction and Harmonics Analysis (Version 1.1.0) [Software]. GitHub.
+Ofori Manu, S. (2026). OFORI Power Tool: Power Factor Correction, Harmonics, and Standards-Aware Load Review (Version 1.1.0) [Software]. GitHub.
+
+The publication manuscript and platform-ready paper package are maintained in `docs/paper-manuscript.md`, `docs/paper-publication-packet.md`, `docs/paper-platform-submissions.md`, and `docs/paper-release-notes.md`.
+
+A companion power-systems manuscript on generator reactive capability and GSU transformer tap effects is maintained in `docs/generator-reactive-capability-manuscript.md` with matching release and platform submission files.
+
+The cleaned MATLAB source appendix for that companion manuscript is maintained in `matlab/generator_reactive_capability_screening.m`.
 
 ## License
 

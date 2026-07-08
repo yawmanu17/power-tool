@@ -253,6 +253,10 @@ label {
   font-weight: 800;
 }
 
+.full-field {
+  margin-top: 12px;
+}
+
 label span {
   color: var(--muted);
   font-weight: 700;

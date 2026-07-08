@@ -6,7 +6,7 @@ Software
 
 ## Title
 
-OFORI Power Tool: Power Factor Correction and Harmonics Analysis
+OFORI Power Tool: Power Factor Correction, Harmonics, and Standards-Aware Load Review
 
 ## Creators
 
@@ -16,7 +16,9 @@ ORCID: 0009-0003-8474-8509
 
 ## Description
 
-OFORI Power Tool is a static browser-based engineering tool for load analysis, power factor correction, energy cost estimation, and harmonics screening. It calculates real, reactive, and apparent power; displacement and true power factor; capacitor compensation requirements; monthly cost estimates; and harmonic distortion screening indicators including voltage THD, current THD, distortion factor, harmonic apparent power, and transformer K-factor estimate.
+OFORI Power Tool is a static browser-based engineering tool for load analysis, power factor correction, energy cost estimation, harmonics screening, report generation, and standards-aware review. It supports single-phase and three-phase systems, LV/MV voltage selection, 50/60 Hz operation, motor HP input, kW + PF, kVA + PF, kW + kVAr, current + PF, demand factor, efficiency, voltage THD, current THD, nonlinear load share, dominant harmonic order, and detuned capacitor indication. It calculates real, reactive, and apparent power; displacement and true power factor; line current; capacitor compensation requirements; capacitance; monthly cost estimates; harmonic apparent power; and transformer K-factor screening.
+
+The repository also includes an IEEE-style publication-ready software paper package documenting the current browser application, numbered formulas, validation example, standards-aware review boundaries, limitations, and platform submission text.
 
 ## Keywords
 
@@ -34,6 +36,8 @@ MIT
 
 - Repository: https://github.com/yawmanu17/power-tool
 - Project page: https://yawmanu17.github.io/power-tool/
+- Manuscript: `docs/paper-manuscript.md`
+- Publication packet: `docs/paper-publication-packet.md`
 
 ## Notes
 
